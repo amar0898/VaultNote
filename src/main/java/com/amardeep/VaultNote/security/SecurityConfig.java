@@ -18,8 +18,8 @@ public class SecurityConfig {
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests((requests) -> requests.anyRequest().authenticated());
         //http.formLogin(Customizer.withDefaults());
+        http.csrf(csrf-> csrf.disable());
         http.httpBasic(Customizer.withDefaults());
-        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return (SecurityFilterChain)http.build();
     }
 }
