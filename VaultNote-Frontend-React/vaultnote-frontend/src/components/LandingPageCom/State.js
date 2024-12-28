@@ -32,7 +32,7 @@ const State = () => {
       </div>
       <div className="mt-10 md:px-0 px-4">
         <h3 className="text-slate-700 text-2xl font-semibold pb-5 pt-6">
-          Metrics For Secure Notes
+          Metrics For Vault Note
         </h3>
 
         <div className="flex md:flex-row flex-col md:gap-0 gap-16 justify-between">
