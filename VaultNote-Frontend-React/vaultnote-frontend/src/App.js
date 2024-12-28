@@ -14,6 +14,7 @@ import NoteDetails from "./components/Notes/NoteDetails";
 import CreateNote from "./components/Notes/CreateNote";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AccessDenied from "./components/Auth/AccessDenied";
+import Admin from "./components/AuditLogs/Admin";
 import UserProfile from "./components/Auth/UserProfile";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import NotFound from "./components/NotFound";
@@ -57,6 +58,15 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+        <Route path="/access-denied" element={<AccessDenied />} />
+        <Route
+          path="/admin/*"
+          element={
+            <ProtectedRoute adminPage={true}>
+              <Admin />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/profile"
           element={
@@ -65,6 +75,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+    <Route path="*" element={<NotFound />} />
     </Routes>
     <Footer />
     </Router>

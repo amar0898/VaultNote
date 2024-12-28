@@ -163,12 +163,12 @@ const Login = () => {
 
             <div className="flex flex-col gap-2">
               <InputField
-                label="UserName"
+                label="Username"
                 required
                 id="username"
                 type="text"
-                message="*UserName is required"
-                placeholder="type your username"
+                message="*Username is required"
+                placeholder="Type your username"
                 register={register}
                 errors={errors}
               />{" "}
@@ -178,7 +178,7 @@ const Login = () => {
                 id="password"
                 type="password"
                 message="*Password is required"
-                placeholder="type your password"
+                placeholder="Type your password"
                 register={register}
                 errors={errors}
               />
@@ -189,7 +189,7 @@ const Login = () => {
               className="bg-customRed font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3"
               type="text"
             >
-              {loading ? <span>Loading...</span> : "LogIn"}
+              {loading ? <span>Loading...</span> : "Log In"}
             </Buttons>
             <p className=" text-sm text-slate-700 ">
               <Link

@@ -83,7 +83,7 @@ const ForgotPassword = () => {
             id="email"
             type="email"
             message="*Email is required"
-            placeholder="enter your email"
+            placeholder="Enter your email"
             register={register}
             errors={errors}
           />{" "}
