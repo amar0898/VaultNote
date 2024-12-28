@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AccessDenied from "./components/Auth/AccessDenied";
 import Admin from "./components/AuditLogs/Admin";
 import UserProfile from "./components/Auth/UserProfile";
+import OAuth2RedirectHandler from "./components/Auth/OAuth2RedirectHandler";
 import ForgotPassword from "./components/Auth/ForgotPassword";
 import NotFound from "./components/NotFound";
 import ResetPassword from "./components/Auth/ResetPassword";
@@ -75,6 +76,7 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+    <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
     <Route path="*" element={<NotFound />} />
     </Routes>
     <Footer />
