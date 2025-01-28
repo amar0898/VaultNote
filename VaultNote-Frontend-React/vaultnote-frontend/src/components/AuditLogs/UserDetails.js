@@ -130,13 +130,13 @@ const UserDetails = () => {
     const { name, checked } = e.target;
 
     let message = null;
-    if (name === "lock") {
+    if (name === "locked") {
       message = "Update Account Lock status Successful";
-    } else if (name === "expire") {
+    } else if (name === "expired") {
       message = "Update Account Expiry status Successful";
     } else if (name === "enabled") {
       message = "Update Account Enabled status Successful";
-    } else if (name === "credentialsExpire") {
+    } else if (name === "expired") {
       message = "Update Account Credentials Expired status Successful";
     }
 
@@ -312,7 +312,7 @@ const UserDetails = () => {
                 <input
                   className="text-14 w-5 h-5"
                   type="checkbox"
-                  name="lock"
+                  name="locked"
                   checked={!user?.accountNonLocked}
                   onChange={(e) =>
                     handleCheckboxChange(e, "/admin/update-lock-status")
@@ -327,7 +327,7 @@ const UserDetails = () => {
                 <input
                   className="text-14 w-5 h-5"
                   type="checkbox"
-                  name="expire"
+                  name="expired"
                   checked={!user?.accountNonExpired}
                   onChange={(e) =>
                     handleCheckboxChange(e, "/admin/update-expiry-status")
@@ -357,7 +357,7 @@ const UserDetails = () => {
                 <input
                   className="text-14 w-5 h-5"
                   type="checkbox"
-                  name="credentialsExpire"
+                  name="expired"
                   checked={!user?.credentialsNonExpired}
                   onChange={(e) =>
                     handleCheckboxChange(

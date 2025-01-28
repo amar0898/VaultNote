@@ -257,32 +257,6 @@ const NoteDetails = () => {
                     className=" text-slate-900 ql-editor"
                     dangerouslySetInnerHTML={{ __html: note?.parsedContent }}
                   ></p>
-
-                  {isAdmin && (
-                    <div className="mt-10">
-                      <h1 className="text-2xl text-center text-slate-700 font-semibold uppercase pt-10 pb-4">
-                        Audit Logs
-                      </h1>
-
-                      <div className="overflow-x-auto ">
-                        <DataGrid
-                          className="w-fit mx-auto "
-                          rows={rows}
-                          columns={auditLogscolumn}
-                          initialState={{
-                            pagination: {
-                              paginationModel: {
-                                pageSize: 6,
-                              },
-                            },
-                          }}
-                          pageSizeOptions={[6]}
-                          disableRowSelectionOnClick
-                          disableColumnResize
-                        />
-                      </div>
-                    </div>
-                  )}
                 </>
               )}
             </>
