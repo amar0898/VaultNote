@@ -3,11 +3,13 @@ package com.amardeep.VaultNote.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import com.amardeep.VaultNote.models.User;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 
 @Entity
 @Data
+@NoArgsConstructor
 public class PasswordResetToken {
 
     @Id

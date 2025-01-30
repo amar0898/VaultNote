@@ -9,6 +9,7 @@ import com.amardeep.VaultNote.repositories.PasswordResetTokenRepository;
 import com.amardeep.VaultNote.repositories.RoleRepository;
 import com.amardeep.VaultNote.repositories.UserRepository;
 import com.amardeep.VaultNote.services.UserService;
+import com.amardeep.VaultNote.util.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -37,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Autowired
+    EmailService emailService;
 
     @Override
     public void updateUserRole(Long userId, String roleName) {
@@ -136,6 +140,24 @@ public class UserServiceImpl implements UserService {
         PasswordResetToken passwordResetToken = new PasswordResetToken(token, expiryDate,user);
         passwordResetTokenRepository.save(passwordResetToken);
         String resetPasswordUrl = frontendUrl + "/reset-password?token=" + token;
+        emailService.sendPasswordResetEmail(user.getEmail(),resetPasswordUrl);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token).orElseThrow(()-> new RuntimeException("Invalid password reset token"));
+
+        if(passwordResetToken.isUsed())
+            throw new RuntimeException("Password reset token is already been used");
+
+        if(passwordResetToken.getExpiryDate().isBefore(Instant.now()))
+            throw new RuntimeException("Password reset token has already been expired");
+
+        User user = passwordResetToken.getUser();
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        passwordResetToken.setUsed(true);
+        passwordResetTokenRepository.save(passwordResetToken);
     }
 
 
