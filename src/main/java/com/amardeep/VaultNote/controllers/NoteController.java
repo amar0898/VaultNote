@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
-@CrossOrigin(origins = "http://localhost:3000", maxAge = 3600, allowCredentials="true")
+//@CrossOrigin(origins = "http://vault-note.s3-website-us-east-1.amazonaws.com", maxAge = 3600, allowCredentials="true")
 public class NoteController {
 
     @Autowired

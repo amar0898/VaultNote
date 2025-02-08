@@ -10,6 +10,7 @@ import com.amardeep.VaultNote.repositories.UserRepository;
 import com.amardeep.VaultNote.security.jwt.AuthEntryPointJwt;
 import com.amardeep.VaultNote.security.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,18 +21,26 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
+//@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
 
     @Autowired
@@ -41,6 +50,9 @@ public class SecurityConfig {
     @Lazy
     OAuth2LoginSuccessHandler loginSuccessHandler;
 
+    @Value("${frontend.url}")
+    private String frontendUrl;
+
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
@@ -48,9 +60,15 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).ignoringRequestMatchers("/api/auth/public/**"));
+
+        //http.addFilterBefore(sameSiteCookieFilter(), UsernamePasswordAuthenticationFilter.class);
+
         http.cors(Customizer.withDefaults());
-        http.authorizeHttpRequests((requests) ->
+        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+        //http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+               // .ignoringRequestMatchers("/api/auth/public/**","/api/csrf-token"));
+                http.csrf(csrf -> csrf.disable());
+                http.authorizeHttpRequests((requests) ->
                 requests.requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/csrf-token").permitAll()
                         .requestMatchers("/api/auth/public/**").permitAll()
@@ -59,11 +77,32 @@ public class SecurityConfig {
                         .oauth2Login(oauth2 -> {
                           oauth2.successHandler(loginSuccessHandler);
                          });
+        //http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.formLogin(Customizer.withDefaults());
         http.httpBasic(Customizer.withDefaults());
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        // Allow specific origins
+        corsConfig.setAllowedOrigins(Collections.singletonList(frontendUrl));
+
+        // Allow specific HTTP methods
+        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Allow specific headers
+        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
+        corsConfig.setExposedHeaders(List.of("X-XSRF-TOKEN"));
+        // Allow credentials (cookies, authorization headers)
+        corsConfig.setAllowCredentials(true);
+        corsConfig.setMaxAge(3600L);
+        // Define allowed paths (for all paths use "/**")
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", corsConfig); // Apply to all endpoints
+        return source;
     }
 
     @Bean
