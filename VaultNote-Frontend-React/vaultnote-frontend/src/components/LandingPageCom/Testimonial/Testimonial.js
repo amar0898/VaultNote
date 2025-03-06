@@ -3,36 +3,27 @@ import TestimonialItem from "./TestimonialItem";
 
 const Testimonial = () => {
   return (
-    <div className="grid lg:grid-cols-3 sm:grid-cols-2  grid-cols-1 gap-x-4 gap-y-10 md:px-0 px-5">
+    <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-4 gap-y-10 md:px-0 px-5">
       <TestimonialItem
-        title="Natives Api"
-        text=" It is a long established fact that a reader will be distracted by the
-        readable content of a page when looking at its layout. The point of
-        using Lorem Ipsum is that it has a more-or-less normal distribution of
-        letters, as opposed to using 'Content here, content here', making it
-        look like readable English."
-        name="Easin"
-        status="Creator"
+        title="Game-Changer"
+        text="Vault Note has revolutionized the way I capture my thoughts. The encryption gives me peace of mind, and the interface is incredibly intuitive. I never worry about losing my ideas again!"
+        name="Alex Johnson"
+        status="Entrepreneur"
+        imgurl="https://randomuser.me/api/portraits/men/32.jpg"
       />
       <TestimonialItem
-        title="Natives Api"
-        text=" It is a long established fact that a reader will be distracted by the
-        readable content of a page when looking at its layout. The point of
-        using Lorem Ipsum is that it has a more-or-less normal distribution of
-        letters, as opposed to using 'Content here, content here', making it
-        look like readable English."
-        name="Easin"
-        status="Creator"
+        title="Reliable & Secure"
+        text="I love how Vault Note keeps my sensitive information private while making it easy to organize all my notes. It's my go-to app for secure documentation."
+        name="Emily Carter"
+        status="Freelance Writer"
+        imgurl="https://randomuser.me/api/portraits/women/45.jpg"
       />
       <TestimonialItem
-        title="Natives Api"
-        text=" It is a long established fact that a reader will be distracted by the
-        readable content of a page when looking at its layout. The point of
-        using Lorem Ipsum is that it has a more-or-less normal distribution of
-        letters, as opposed to using 'Content here, content here', making it
-        look like readable English."
-        name="Easin"
-        status="Creator"
+        title="Best Note-Taking App"
+        text="Switching to Vault Note was the best decision for managing my professional notes. The robust encryption and seamless sync across devices are truly impressive."
+        name="Michael Lee"
+        status="Software Engineer"
+        imgurl="https://randomuser.me/api/portraits/men/65.jpg"
       />
     </div>
   );

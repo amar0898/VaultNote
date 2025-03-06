@@ -1,33 +1,32 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { jwtDecode } from "jwt-decode";
 import InputField from "../InputField/InputField";
 import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaLock, FaEye, FaEyeSlash } from "react-icons/fa"; // Added icons
 import Divider from "@mui/material/Divider";
 import Buttons from "../../utils/Buttons";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
-import { useEffect } from "react";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
 const Login = () => {
-  // Step 1: Login method and Step 2: Verify 2FA
   const [step, setStep] = useState(1);
   const [jwtToken, setJwtToken] = useState("");
   const [loading, setLoading] = useState(false);
-  // Access the token and setToken function using the useMyContext hook from the ContextProvider
   const { setToken, token } = useMyContext();
   const navigate = useNavigate();
+  const [isFormFilled, setIsFormFilled] = useState(false); // State to track if both fields are filled
+  const [showPassword, setShowPassword] = useState(false); // State to toggle password visibility
 
-  //react hook form initialization
   const {
     register,
     handleSubmit,
     reset,
+    watch, // Use `watch` from react-hook-form to track input values
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -38,6 +37,19 @@ const Login = () => {
     mode: "onTouched",
   });
 
+  // Watch the values of username and password fields
+  const username = watch("username");
+  const password = watch("password");
+
+  // Effect to update `isFormFilled` state based on input values
+  useEffect(() => {
+    if (username && password) {
+      setIsFormFilled(true);
+    } else {
+      setIsFormFilled(false);
+    }
+  }, [username, password]);
+
   const handleSuccessfulLogin = (token, decodedToken) => {
     const user = {
       username: decodedToken.sub,
@@ -45,37 +57,26 @@ const Login = () => {
     };
     localStorage.setItem("JWT_TOKEN", token);
     localStorage.setItem("USER", JSON.stringify(user));
-
-    //store the token on the context state  so that it can be shared any where in our application by context provider
     setToken(token);
-
     navigate("/notes");
   };
 
-  //function for handle login with credentials
   const onLoginHandler = async (data) => {
     try {
       setLoading(true);
       const response = await api.post("/auth/public/signin", data);
-
-      //showing success message with react hot toast
       toast.success("Login Successful");
-
-      //reset the input field by using reset() function provided by react hook form after submission
       reset();
-
       if (response.status === 200 && response.data.jwtToken) {
         setJwtToken(response.data.jwtToken);
         const decodedToken = jwtDecode(response.data.jwtToken);
         if (decodedToken.is2faEnabled) {
-          setStep(2); // Move to 2FA verification step
+          setStep(2);
         } else {
           handleSuccessfulLogin(response.data.jwtToken, decodedToken);
         }
       } else {
-        toast.error(
-          "Login failed. Please check your credentials and try again."
-        );
+        toast.error("Login failed. Please check your credentials and try again.");
       }
     } catch (error) {
       if (error) {
@@ -86,22 +87,18 @@ const Login = () => {
     }
   };
 
-  //function for verify 2fa authentication
   const onVerify2FaHandler = async (data) => {
     const code = data.code;
     setLoading(true);
-
     try {
       const formData = new URLSearchParams();
       formData.append("code", code);
       formData.append("jwtToken", jwtToken);
-
       await api.post("/auth/public/verify-2fa-login", formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-
       const decodedToken = jwtDecode(jwtToken);
       handleSuccessfulLogin(jwtToken, decodedToken);
     } catch (error) {
@@ -112,56 +109,48 @@ const Login = () => {
     }
   };
 
-  //if there is token  exist navigate  the user to the home page if he tried to access the login page
   useEffect(() => {
     if (token) navigate("/");
   }, [navigate, token]);
 
-  //step1 will render the login form and step-2 will render the 2fa verification form
   return (
-    <div className="min-h-[calc(100vh-74px)] flex justify-center items-center">
+    <div className="min-h-[calc(100vh-74px)] flex justify-center items-center bg-[#f0f4f8]">
       {step === 1 ? (
         <React.Fragment>
           <form
             onSubmit={handleSubmit(onLoginHandler)}
-            className="sm:w-[450px] w-[360px]  shadow-custom py-8 sm:px-8 px-4"
+            className="sm:w-[450px] w-[360px] bg-white shadow-lg rounded-lg py-8 sm:px-8 px-4 border border-gray-200"
           >
             <div>
-              <h1 className="font-montserrat text-center font-bold text-2xl">
-                Login Here
+              <h1 className="font-serif text-center font-bold text-3xl text-gray-800">
+                Vault Note Login
               </h1>
-              <p className="text-slate-600 text-center">
-                Please Enter your username and password{" "}
+              <p className=" font-serif text-gray-600 text-center mt-2">
+                Log in to continue to your Vault Note account!
               </p>
-              <div className="flex items-center justify-between gap-1 py-5 ">
+              <div className="flex items-center justify-between gap-1 py-5">
                 <Link
                   to={`${apiUrl}/oauth2/authorization/google`}
-                  className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm shadow-slate-200 rounded-md hover:bg-slate-300 transition-all duration-300"
+                  className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm rounded-md hover:bg-gray-100 transition-all duration-300"
                 >
-                  <span>
-                    <FcGoogle className="text-2xl" />
-                  </span>
-                  <span className="font-semibold sm:text-customText text-xs">
+                  <FcGoogle className="text-2xl" />
+                  <span className="font-serif font-semibold sm:text-customText text-xs text-gray-700">
                     Login with Google
                   </span>
                 </Link>
                 <Link
                   to={`${apiUrl}/oauth2/authorization/github`}
-                  className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm shadow-slate-200 rounded-md hover:bg-slate-300 transition-all duration-300"
+                  className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm rounded-md hover:bg-gray-100 transition-all duration-300"
                 >
-                  <span>
-                    <FaGithub className="text-2xl" />
-                  </span>
-                  <span className="font-semibold sm:text-customText text-xs">
+                  <FaGithub className="text-2xl" />
+                  <span className="font-serif font-semibold sm:text-customText text-xs text-gray-700">
                     Login with Github
                   </span>
                 </Link>
               </div>
-
-              <Divider className="font-semibold">OR</Divider>
+              <Divider className="font-serif font-semibold text-gray-400">OR</Divider>
             </div>
-
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mt-4 font-serif">
               <InputField
                 label="Username"
                 required
@@ -171,39 +160,51 @@ const Login = () => {
                 placeholder="Type your username"
                 register={register}
                 errors={errors}
-              />{" "}
-              <InputField
-                label="Password"
-                required
-                id="password"
-                type="password"
-                message="*Password is required"
-                placeholder="Type your password"
-                register={register}
-                errors={errors}
               />
+              <div className="relative">
+                <InputField
+                  label="Password"
+                  required
+                  id="password"
+                  type={showPassword ? "text" : "password"} // Toggle password visibility
+                  message="*Password is required"
+                  placeholder="Type your password"
+                  register={register}
+                  errors={errors}
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-12 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  onClick={() => setShowPassword(!showPassword)} // Toggle show/hide password
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />} {/* Eye icon */}
+                </button>
+              </div>
             </div>
             <Buttons
-              disabled={loading}
+              disabled={loading || !isFormFilled} // Disable button if form is not filled
               onClickhandler={() => {}}
-              className="bg-customRed font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3"
+              className={`font-semibold text-white w-full py-2 transition-colors duration-100 rounded-md my-3 ${
+                isFormFilled ? "bg-[#27ae60] hover:bg-[#2ecc71]" : "bg-[#2c3e50] hover:bg-[#34495e]"
+              }`}
               type="text"
-            >
-              {loading ? <span>Loading...</span> : "Log In"}
+            >.
+              <div className="font-serif flex items-center justify-center gap-2">
+                <span>{loading ? "Loading..." : "Log In"}</span>
+              </div>
             </Buttons>
-            <p className=" text-sm text-slate-700 ">
+            <p className="font-serif text-sm text-gray-700">
               <Link
-                className=" underline hover:text-black"
+                className="underline hover:text-[#3498db]"
                 to="/forgot-password"
               >
                 Forgot Password?
               </Link>
             </p>
-
-            <p className="text-center text-sm text-slate-700 mt-6">
+            <p className="font-serif text-center text-sm text-gray-700 mt-6">
               Don't have an account?{" "}
               <Link
-                className="font-semibold underline hover:text-black"
+                className="font-semibold underline hover:text-[#3498db]"
                 to="/signup"
               >
                 SignUp
@@ -215,19 +216,17 @@ const Login = () => {
         <React.Fragment>
           <form
             onSubmit={handleSubmit(onVerify2FaHandler)}
-            className="sm:w-[450px] w-[360px]  shadow-custom py-8 sm:px-8 px-4"
+            className="sm:w-[450px] w-[360px] bg-white shadow-lg rounded-lg py-8 sm:px-8 px-4 border border-gray-200"
           >
             <div>
-              <h1 className="font-montserrat text-center font-bold text-2xl">
+              <h1 className="font-montserrat text-center font-bold text-2xl text-gray-800">
                 Verify 2FA
               </h1>
-              <p className="text-slate-600 text-center">
+              <p className="text-gray-600 text-center mt-2">
                 Enter the correct code to complete 2FA Authentication
               </p>
-
-              <Divider className="font-semibold pb-4"></Divider>
+              <Divider className="font-semibold text-gray-400 pb-4"></Divider>
             </div>
-
             <div className="flex flex-col gap-2 mt-4">
               <InputField
                 label="Enter Code"
@@ -243,7 +242,7 @@ const Login = () => {
             <Buttons
               disabled={loading}
               onClickhandler={() => {}}
-              className="bg-customRed font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3"
+              className="bg-[#27ae60] font-semibold text-white w-full py-2 hover:bg-[#2ecc71] transition-colors duration-100 rounded-md my-3"
               type="text"
             >
               {loading ? <span>Loading...</span> : "Verify 2FA"}

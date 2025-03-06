@@ -6,50 +6,57 @@ import {
   FaLinkedinIn,
   FaInstagram,
 } from "react-icons/fa";
-//import aboutImage from "./path/to/your/image.jpg"; // Add your image path here
 
 const AboutPage = () => {
   return (
-    <div className=" p-8   bg-gray-100 min-h-screen">
-      <div className="md:w-1/2">
-        <h1 className="text-4xl font-bold mb-4">About Us</h1>
-        <p className="mb-4">
-          Welcome to VaultNote, your trusted companion for secure and private
-          note-taking. We believe in providing a safe space where your thoughts
-          and ideas are protected with the highest level of security. Our
-          mission is to ensure that your notes are always accessible to you and
-          only you. With state-of-the-art encryption and user-friendly features,
-          SecureNote is designed to keep your information confidential and
-          secure.
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-8">
+      <div className="w-full max-w-5xl p-10 bg-white shadow-xl rounded-lg border border-gray-200">
+        <h1 className="text-5xl font-bold text-center text-gray-800 mb-6">
+          About VaultNote
+        </h1>
+        <p className="text-gray-700 text-lg text-center mb-10">
+          Welcome to VaultNote – the ultimate solution for secure and private note-taking.
+          Our mission is to provide you with a digital vault where your thoughts, ideas, and sensitive
+          information are protected by industry-leading encryption and robust security measures.
         </p>
-
-        <ul className="list-disc list-inside mb-4 text-sm px-6 py-2">
-          <li className="mb-2">
-            Add an extra layer of security with two-factor authentication.
-          </li>
-          <li className="mb-2">
-            Your notes are encrypted from the moment you create them
-          </li>
-          <li className="mb-2">
-            Access your notes from anywhere with the assurance that they are
-            stored .
-          </li>
-          <li className="mb-2">
-            Our app is designed to be intuitive and easy to use.
-          </li>
-        </ul>
-        <div className="flex space-x-4 mt-10">
-          <Link className="text-white rounded-full p-2 bg-customRed  " to="/">
-            <FaFacebookF size={24} />
+        <div className="grid md:grid-cols-2 gap-8">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-800 mb-4">Our Features</h2>
+            <ul className="list-disc pl-6 space-y-3 text-gray-700">
+              <li>
+                <span className="font-medium text-green-600">Advanced Encryption:</span> Your notes are secured with state-of-the-art encryption.
+              </li>
+              <li>
+                <span className="font-medium text-green-600">Two-Factor Authentication:</span> Add an extra layer of protection to your account.
+              </li>
+              <li>
+                <span className="font-medium text-green-600">Cloud Synchronization:</span> Access your secure notes anytime, anywhere.
+              </li>
+              <li>
+                <span className="font-medium text-green-600">User-Friendly Interface:</span> Enjoy a modern, intuitive design that makes note-taking effortless.
+              </li>
+            </ul>
+          </div>
+          <div className="flex items-center justify-center">
+            <img
+              src="/logo192.png"
+              alt="VaultNote Illustration"
+              className="w-[250px] h-[250px] rounded-lg shadow-md"
+            />
+          </div>
+        </div>
+        <div className="mt-10 flex justify-center space-x-6">
+          <Link className="text-white p-3 bg-blue-600 rounded-full hover:bg-blue-700 transition" to="/">
+            <FaFacebookF size={20} />
           </Link>
-          <Link className="text-white rounded-full p-2 bg-customRed  " to="/">
-            <FaTwitter size={24} />
+          <Link className="text-white p-3 bg-blue-500 rounded-full hover:bg-blue-600 transition" to="/">
+            <FaTwitter size={20} />
           </Link>
-          <Link className="text-white rounded-full p-2 bg-customRed  " to="/">
-            <FaLinkedinIn size={24} />
+          <Link className="text-white p-3 bg-blue-700 rounded-full hover:bg-blue-800 transition" to="/">
+            <FaLinkedinIn size={20} />
           </Link>
-          <Link className="text-white rounded-full p-2 bg-customRed  " to="/">
-            <FaInstagram size={24} />
+          <Link className="text-white p-3 bg-pink-600 rounded-full hover:bg-pink-700 transition" to="/">
+            <FaInstagram size={20} />
           </Link>
         </div>
       </div>

@@ -11,6 +11,7 @@ import Buttons from "../../utils/Buttons";
 import Errors from "../Errors";
 import toast from "react-hot-toast";
 import Modals from "../PopModal";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 //importing the the columns from the auditlogs
 import { auditLogscolumn } from "../../utils/tableColumn";
 
@@ -122,14 +123,14 @@ const NoteDetails = () => {
   //edit the note content
   const onNoteEditHandler = async () => {
     if (editorContent.trim().length === 0) {
-      return toast.error("Note content Shouldn't be empty");
+      return showErrorToast("Add some content to your note!");
     }
 
     try {
       setNoteEditLoader(true);
       const noteData = { content: editorContent };
       await api.put(`/notes/${id}`, noteData);
-      toast.success("Note update successful");
+      showSuccessToast("Your note updated successfully");
       setEditEnable(false);
       fetchNoteDetails();
       checkAdminRole();
@@ -137,7 +138,7 @@ const NoteDetails = () => {
         fetchAuditLogs();
       }
     } catch (err) {
-      toast.error("Update Note Failed");
+      showErrorToast("Error while updating your note");
     } finally {
       setNoteEditLoader(false);
     }
@@ -241,7 +242,7 @@ const NoteDetails = () => {
                     <Buttons
                       disabled={noteEditLoader}
                       onClickhandler={onNoteEditHandler}
-                      className="bg-customRed  md:mt-16 mt-28 text-white px-4 py-2 hover:text-slate-300 rounded-sm"
+                      className="bg-btnColor  md:mt-16 mt-28 text-white px-4 py-2 hover:text-slate-300 rounded-md"
                     >
                       {noteEditLoader ? (
                         <span>Loading...</span>

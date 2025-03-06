@@ -9,53 +9,35 @@ import BrandItem from "./BrandItem";
 
 const Brands = () => {
   return (
-    <div className="grid lg:grid-cols-3  sm:grid-cols-2 grid-cols-1 gap-x-4 gap-y-10 pt-20 md:px-0 px-5">
+    <div className="grid lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-x-4 gap-y-10 pt-20 md:px-0 px-5">
       <BrandItem
-        title="World Class Partners"
-        text="Connect with LinkedIn, Google, and 70+ other apps and tools to get more
-        done. Make your work easier by linking your favorite platforms. Stay on
-        top of tasks, calendars, and messages in one spot. Save time and focus
-        better with our easy connections."
+        title="End-to-End Encryption"
+        text="Your notes are secured with state-of-the-art encryption, ensuring that only you can access your data."
         icon={IoIosPartlySunny}
-      />{" "}
+      />
       <BrandItem
-        title="Fast Global Supports"
-        text="Connect with LinkedIn, Google, and 70+ other apps and tools to get more
-        done. Make your work easier by linking your favorite platforms. Stay on
-        top of tasks, calendars, and messages in one spot. Save time and focus
-        better with our easy connections."
+        title="Global Accessibility"
+        text="Access your secure notes from anywhere in the world, on any device, with seamless cloud synchronization."
         icon={AiOutlineGlobal}
-      />{" "}
+      />
       <BrandItem
-        title="Trusting Security"
-        text="Connect with LinkedIn, Google, and 70+ other apps and tools to get more
-        done. Make your work easier by linking your favorite platforms. Stay on
-        top of tasks, calendars, and messages in one spot. Save time and focus
-        better with our easy connections."
+        title="Uncompromised Security"
+        text="Our robust security protocols safeguard your sensitive information against unauthorized access."
         icon={MdOutlineSecurity}
-      />{" "}
+      />
       <BrandItem
-        title="Anywhere reculting"
-        text="Connect with LinkedIn, Google, and 70+ other apps and tools to get more
-        done. Make your work easier by linking your favorite platforms. Stay on
-        top of tasks, calendars, and messages in one spot. Save time and focus
-        better with our easy connections."
+        title="Seamless Synchronization"
+        text="Enjoy real-time updates across all your devices, keeping your notes current and accessible."
         icon={SiPythonanywhere}
-      />{" "}
+      />
       <BrandItem
-        title="Export Advice"
-        text="Connect with LinkedIn, Google, and 70+ other apps and tools to get more
-        done. Make your work easier by linking your favorite platforms. Stay on
-        top of tasks, calendars, and messages in one spot. Save time and focus
-        better with our easy connections."
+        title="Smart Data Export"
+        text="Effortlessly export your secure notes in various formats, giving you full control over your data."
         icon={TbPackageExport}
-      />{" "}
+      />
       <BrandItem
-        title="Assisted Onboarding"
-        text="Connect with LinkedIn, Google, and 70+ other apps and tools to get more
-        done. Make your work easier by linking your favorite platforms. Stay on
-        top of tasks, calendars, and messages in one spot. Save time and focus
-        better with our easy connections."
+        title="Personalized Assistance"
+        text="Our dedicated support team is ready to provide personalized guidance for your secure note experience."
         icon={FcAssistant}
       />
     </div>

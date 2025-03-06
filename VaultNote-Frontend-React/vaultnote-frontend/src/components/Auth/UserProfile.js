@@ -332,22 +332,13 @@ const UserProfile = () => {
                 <h3 className="font-semibold text-2xl">
                   {currentUser?.username}
                 </h3>
-              </div>
-              <div className="my-4 ">
-                <div className="space-y-2 px-4 mb-1">
-                  <h1 className="font-semibold text-md text-slate-800">
-                    UserName :{" "}
-                    <span className=" text-slate-700  font-normal">
-                      {currentUser?.username}
-                    </span>
-                  </h1>
-                  <h1 className="font-semibold text-md text-slate-800">
-                    Role :{" "}
-                    <span className=" text-slate-700  font-normal">
+                <h3 className="font-semibold">
+                    <span className="font-semibold text-2xl">
                       {currentUser && currentUser["roles"][0]}
                     </span>
-                  </h1>
-                </div>
+                  </h3>
+              </div>
+              <div className="my-4 ">
                 <div className="py-3">
                   <Accordion expanded={openAccount}>
                     <AccordionSummary
@@ -358,7 +349,7 @@ const UserProfile = () => {
                       id="panel1-header"
                     >
                       <h3 className="text-slate-800 text-lg font-semibold ">
-                        Update User Credentials
+                        Update Account Credentials
                       </h3>
                     </AccordionSummary>
                     <AccordionDetails className="shadow-md shadow-gray-300">
@@ -367,13 +358,13 @@ const UserProfile = () => {
                         onSubmit={handleSubmit(handleUpdateCredential)}
                       >
                         <InputField
-                          label="UserName"
+                          label="Username"
                           required
                           id="username"
                           className="text-sm"
                           type="text"
                           message="*Username is required"
-                          placeholder="Enter your username"
+                          placeholder="Type your new username"
                           register={register}
                           errors={errors}
                         />{" "}
@@ -384,25 +375,25 @@ const UserProfile = () => {
                           className="text-sm"
                           type="email"
                           message="*Email is required"
-                          placeholder="Enter your email"
+                          placeholder="Type your email"
                           register={register}
                           errors={errors}
                           readOnly
                         />{" "}
                         <InputField
-                          label="Enter New Password"
+                          label="Password"
                           id="password"
                           className="text-sm"
                           type="password"
                           message="*Password is required"
-                          placeholder="type your password"
+                          placeholder="Type your new password"
                           register={register}
                           errors={errors}
                           min={6}
                         />
                         <Buttons
                           disabled={loading}
-                          className="bg-customRed font-semibold flex justify-center text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3"
+                          className="bg-btnColor font-semibold flex justify-center text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-md my-3"
                           type="submit"
                         >
                           {loading ? <span>Loading...</span> : "Update"}
@@ -410,86 +401,13 @@ const UserProfile = () => {
                       </form>
                     </AccordionDetails>
                   </Accordion>
-                  <div className="mt-6">
-                    <Accordion expanded={openSetting}>
-                      <AccordionSummary
-                        className="shadow-md shadow-gray-300"
-                        onClick={onOpenSettingHandler}
-                        expandIcon={<ArrowDropDownIcon />}
-                        aria-controls="panel1-content"
-                        id="panel1-header"
-                      >
-                        <h3 className="text-slate-800 text-lg font-semibold">
-                          Account Setting
-                        </h3>
-                      </AccordionSummary>
-                      <AccordionDetails className="shadow-md shadow-gray-300">
-                        <div className="flex flex-col gap-4">
-                          <div>
-                            <h3 className="text-slate-700 font-customWeight text-sm ">
-                              Account Expired
-                            </h3>
-                            <Switch
-                              checked={accountExpired}
-                              onChange={handleAccountExpiryStatus}
-                              inputProps={{ "aria-label": "controlled" }}
-                            />
-                          </div>{" "}
-                          <div>
-                            <h3 className="text-slate-700 font-customWeight text-sm ">
-                              Account Locked
-                            </h3>
-                            <Switch
-                              checked={accountLocked}
-                              onChange={handleAccountLockStatus}
-                              inputProps={{ "aria-label": "controlled" }}
-                            />
-                          </div>{" "}
-                          <div>
-                            <h3 className="text-slate-700 font-customWeight text-sm ">
-                              Account Enabled
-                            </h3>
-                            <Switch
-                              checked={accountEnabled}
-                              onChange={handleAccountEnabledStatus}
-                              inputProps={{ "aria-label": "controlled" }}
-                            />
-                          </div>
-                          <>
-                            <div className="mb-2">
-                              <h3 className="text-slate-700 font-customWeight text-sm ">
-                                Credential Setting
-                              </h3>
-                              <div className="shadow-gray-300 shadow-md px-4 py-4 rounded-md">
-                                <p className="text-slate-700  text-sm ">
-                                  Your credential will expired{" "}
-                                  <span>{credentialExpireDate}</span>
-                                </p>
-                              </div>
-                            </div>
-                          </>
-                          <div>
-                            <h3 className="text-slate-700 font-customWeight text-sm">
-                              Credential Expired
-                            </h3>
-                            <Switch
-                              checked={credentialExpired}
-                              onChange={handleCredentialExpiredStatus}
-                              inputProps={{ "aria-label": "controlled" }}
-                            />
-                          </div>
-                        </div>
-                      </AccordionDetails>
-                    </Accordion>
-                  </div>
-
                   <div className="pt-10 ">
                     <h3 className="text-slate-800 text-lg font-semibold  mb-2 px-2">
                       Last Login Session
                     </h3>
                     <div className="shadow-md shadow-gray-300 px-4 py-2 rounded-md">
                       <p className="text-slate-700 text-sm">
-                        Your Last LogIn Session when you are loggedin <br />
+                        Your last Log in session when you are logged in <br />
                         <span>{loginSession}</span>
                       </p>
                     </div>
@@ -500,7 +418,7 @@ const UserProfile = () => {
             <div className="flex-1 flex flex-col shadow-lg shadow-gray-300 gap-2 px-4 py-6">
               <div className="space-y-1">
                 <h1 className="text-slate-800 flex items-center gap-1 text-2xl font-bold">
-                  <span>Authentication (MFA)</span>
+                  <span>Multi Factor Authentication</span>
                   <span
                     className={` ${
                       is2faEnabled ? "bg-green-800" : "bg-customRed"
@@ -509,12 +427,9 @@ const UserProfile = () => {
                     {is2faEnabled ? "Activated" : "Deactivated"}
                   </span>
                 </h1>{" "}
-                <h3 className="text-slate-800 text-xl font-semibold">
-                  Multi Factor Authentication
-                </h3>{" "}
+                
                 <p className="text-slate-800 text-sm ">
-                  Two Factor Authentication Add a additional layer of security
-                  to your account
+                 Add a additional layer of security to your account to keep it protected and safe
                 </p>
               </div>
 

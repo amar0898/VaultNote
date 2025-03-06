@@ -8,19 +8,24 @@ import moment from "moment";
 
 const NoteItems = ({ parsedContent, id, createdAt }) => {
   const formattedDate = moment(createdAt).format("D MMMM YYYY");
+
   return (
-    <div className="sm:px-5 px-2 py-5 shadow-md bg-noteColor shadow-white rounded-lg min-h-96 max-h-96 relative overflow-hidden ">
-      <p
-        className="text-black font-customWeight ql-editor"
-        dangerouslySetInnerHTML={{ __html: truncateText(parsedContent) }}
-      ></p>
-      <div className="flex justify-between items-center  absolute bottom-5 sm:px-5 px-2 left-0 w-full text-slate-700">
-        <span>{formattedDate}</span>
+    <div className="relative bg-gradient-to-b from-slate-100 to-slate-200 text-gray-800 rounded-lg shadow-md min-h-[24rem] max-h-[24rem] overflow-hidden p-5 transition-transform transform hover:scale-105">
+      {/* Note Content with bottom margin so content doesn't get hidden under footer */}
+      <div className="mb-12">
+        <div
+          className="ql-editor font-customWeight"
+          dangerouslySetInnerHTML={{ __html: truncateText(parsedContent) }}
+        />
+      </div>
+
+      {/* Footer overlay fixed at the bottom */}
+      <div className="absolute bottom-0 left-0 w-full flex justify-between items-center px-4 py-2 bg-opacity-70">
+        <span className="text-black text-sm">{formattedDate}</span>
         <Link to={`/notes/${id}`}>
-          {" "}
-          <Tooltip title="View Note">
+          <Tooltip title="Edit Note">
             <IconButton>
-              <MdRemoveRedEye className="text-slate-700" />
+              <MdRemoveRedEye className="text-black"/>
             </IconButton>
           </Tooltip>
         </Link>

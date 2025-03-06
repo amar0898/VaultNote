@@ -1,62 +1,105 @@
-import React from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import Buttons from "../../utils/Buttons";
 
 const ContactPage = () => {
-  const onSubmitHandler = (event) => {
-    event.preventDefault();
+  const [loading, setLoading] = useState(false);
+
+  // Initialize React Hook Form
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+    mode: "onTouched",
+  });
+
+  // Watch the input values from react-hook-form
+  const name = watch("name");
+  const email = watch("email");
+  const message = watch("message");
+
+  // The button should be enabled only when all fields have a value
+  const isFormFilled = name && email && message;
+
+  // onSubmitHandler will be called when the form is valid and submitted
+  const onSubmitHandler = (data) => {
+    //console.log("Form Data:", data);
+    // You can add your submission logic here.
   };
+
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-74px)] bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full mx-4 text-center border border-gray-700">
         <h1 className="text-3xl font-bold mb-4">Contact Us</h1>
         <p className="text-gray-600 mb-4">
-          We'd love to hear from you! If you have any questions or feedback,
-          feel free to reach out to us.
+          We'd love to hear from you! If you have any questions or feedback, feel free to reach out to us.
         </p>
-        <form onSubmit={onSubmitHandler} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmitHandler)} className="space-y-4">
           <div>
-            <label
-              className="block text-left text-gray-700 mb-2"
-              htmlFor="name"
-            >
+            <label className="block text-left text-gray-700 mb-2" htmlFor="name">
               Name
             </label>
             <input
               type="text"
               id="name"
+              {...register("name", { required: "Name is required." })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.name && (
+              <p className="text-red-500 text-left text-sm mt-1">{errors.name.message}</p>
+            )}
           </div>
           <div>
-            <label
-              className="block text-left text-gray-700 mb-2"
-              htmlFor="email"
-            >
+            <label className="block text-left text-gray-700 mb-2" htmlFor="email">
               Email
             </label>
             <input
               type="email"
               id="email"
+              {...register("email", {
+                required: "Email is required.",
+                pattern: {
+                  value: /\S+@\S+\.\S+/,
+                  message: "Email is invalid.",
+                },
+              })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {errors.email && (
+              <p className="text-red-500 text-left text-sm mt-1">{errors.email.message}</p>
+            )}
           </div>
           <div>
-            <label
-              className="block text-left text-gray-700 mb-2"
-              htmlFor="message"
-            >
+            <label className="block text-left text-gray-700 mb-2" htmlFor="message">
               Message
             </label>
             <textarea
               id="message"
+              {...register("message", { required: "Message is required." })}
               className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             ></textarea>
+            {errors.message && (
+              <p className="text-red-500 text-left text-sm mt-1">{errors.message.message}</p>
+            )}
           </div>
-          <button
+          <Buttons
+            disabled={!isFormFilled}
             type="submit"
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className={`font-semibold text-white w-full py-2 transition-colors duration-100 rounded-md my-3 ${
+              isFormFilled ? "bg-[#27ae60] hover:bg-[#2ecc71]" : "bg-[#2c3e50] hover:bg-[#34495e]"
+            }`}
           >
-            Send Message
-          </button>
+            <div className="font-serif flex items-center justify-center gap-2">
+              <span>{loading ? "Loading..." : "Send Message"}</span>
+            </div>
+          </Buttons>
         </form>
       </div>
     </div>

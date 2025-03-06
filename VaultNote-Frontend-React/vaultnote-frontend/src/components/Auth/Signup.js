@@ -1,28 +1,28 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../../services/api";
 import { FcGoogle } from "react-icons/fc";
-import { FaGithub } from "react-icons/fa";
+import { FaGithub, FaEye, FaEyeSlash } from "react-icons/fa";
 import Divider from "@mui/material/Divider";
 import Buttons from "../../utils/Buttons";
 import InputField from "../InputField/InputField";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
-import { useEffect } from "react";
 
 const Signup = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
   const [role, setRole] = useState();
   const [loading, setLoading] = useState(false);
-  // Access the token and setToken function using the useMyContext hook from the ContextProvider
   const { token } = useMyContext();
   const navigate = useNavigate();
+  const [isFormFilled, setIsFormFilled] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  //react hook form initialization
   const {
     register,
     handleSubmit,
+    watch,
     reset,
     setError,
     formState: { errors },
@@ -34,6 +34,19 @@ const Signup = () => {
     },
     mode: "onTouched",
   });
+
+   // Watch the values of username and password fields
+    const username = watch("username");
+    const password = watch("password");
+  
+    // Effect to update `isFormFilled` state based on input values
+    useEffect(() => {
+      if (username && password) {
+        setIsFormFilled(true);
+      } else {
+        setIsFormFilled(false);
+      }
+    }, [username, password]);
 
   useEffect(() => {
     setRole("ROLE_USER");
@@ -51,15 +64,12 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await api.post("/auth/public/signup", sendData);
-      toast.success("Reagister Successful");
+      toast.success("Register Successful");
       reset();
       if (response.data) {
         navigate("/login");
       }
     } catch (error) {
-      // Add an error programmatically by using the setError function provided by react-hook-form
-      //setError(keyword,message) => keyword means the name of the field where I want to show the error
-
       if (
         error?.response?.data?.message === "Error: Username is already taken!"
       ) {
@@ -74,55 +84,52 @@ const Signup = () => {
     }
   };
 
-  //if there is token  exist navigate to the user to the home page if he tried to access the login page
   useEffect(() => {
     if (token) navigate("/");
   }, [navigate, token]);
 
   return (
-    <div className="min-h-[calc(100vh-74px)] flex justify-center items-center">
+    <div className="min-h-[calc(100vh-74px)] flex justify-center items-center bg-[#f0f4f8]">
       <form
         onSubmit={handleSubmit(onSubmitHandler)}
-        className="sm:w-[450px] w-[360px]  shadow-custom py-6 sm:px-8 px-4"
+        className="sm:w-[450px] w-[360px] bg-white shadow-lg rounded-lg py-8 sm:px-8 px-4 border border-gray-200"
       >
         <div>
-          <h1 className="font-montserrat text-center font-bold text-2xl">
-            Register Here Here
+          <h1 className="font-serif text-center font-bold text-3xl text-gray-800">
+            Register Here
           </h1>
-          <p className="text-slate-600 text-center">
-            Enter your credentials to create new account
+          <p className="font-serif text-gray-600 text-center mt-2">
+            Enter your details to create a new account!
           </p>
-          <div className="flex items-center justify-between gap-1 py-5 ">
+          <div className="flex items-center justify-between gap-1 py-5">
             <a
               href={`${apiUrl}/oauth2/authorization/google`}
-              className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm shadow-slate-200 rounded-md hover:bg-slate-300 transition-all duration-300"
+              className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm rounded-md hover:bg-gray-100 transition-all duration-300"
             >
-              <span>
-                <FcGoogle className="text-2xl" />
-              </span>
-              <span className="font-semibold sm:text-customText text-xs">
+              <FcGoogle className="text-2xl" />
+              <span className="font-serif font-semibold sm:text-customText text-xs text-gray-700">
                 Login with Google
               </span>
             </a>
             <a
               href={`${apiUrl}/oauth2/authorization/github`}
-              className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm shadow-slate-200 rounded-md hover:bg-slate-300 transition-all duration-300"
+              className="flex gap-1 items-center justify-center flex-1 border p-2 shadow-sm rounded-md hover:bg-gray-100 transition-all duration-300"
             >
-              <span>
-                <FaGithub className="text-2xl" />
-              </span>
-              <span className="font-semibold sm:text-customText text-xs">
+              <FaGithub className="text-2xl" />
+              <span className="font-serif font-semibold sm:text-customText text-xs text-gray-700">
                 Login with Github
               </span>
             </a>
           </div>
-
-          <Divider className="font-semibold">OR</Divider>
+  
+          <Divider className="font-serif font-semibold text-gray-400">
+            OR
+          </Divider>
         </div>
-
-        <div className="flex flex-col gap-2">
+  
+        <div className="flex flex-col gap-2 mt-4 font-serif">
           <InputField
-            label="UserName"
+            label="Username"
             required
             id="username"
             type="text"
@@ -130,7 +137,7 @@ const Signup = () => {
             placeholder="Type your username"
             register={register}
             errors={errors}
-          />{" "}
+          />
           <InputField
             label="Email"
             required
@@ -141,31 +148,45 @@ const Signup = () => {
             register={register}
             errors={errors}
           />
-          <InputField
-            label="Password"
-            required
-            id="password"
-            type="password"
-            message="*Password is required"
-            placeholder="Type your password"
-            register={register}
-            errors={errors}
-            min={6}
-          />
+          {/* Wrap password field in a relative container */}
+          <div className="relative">
+            <InputField
+              label="Password"
+              required
+              id="password"
+              type={showPassword ? "text" : "password"}
+              message="*Password is required"
+              placeholder="Type your password"
+              register={register}
+              errors={errors}
+              min={6}
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-12 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
+          </div>
         </div>
         <Buttons
-          disabled={loading}
-          onClickhandler={() => {}}
-          className="bg-customRed font-semibold flex justify-center text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3"
-          type="text"
-        >
-          {loading ? <span>Loading...</span> : "Register"}
-        </Buttons>
-
-        <p className="text-center text-sm text-slate-700 mt-2">
+              disabled={loading || !isFormFilled} // Disable button if form is not filled
+              onClickhandler={() => {}}
+              className={`font-semibold text-white w-full py-2 transition-colors duration-100 rounded-md my-3 ${
+                isFormFilled ? "bg-[#27ae60] hover:bg-[#2ecc71]" : "bg-[#2c3e50] hover:bg-[#34495e]"
+              }`}
+              type="text"
+            >
+              <div className="font-serif flex items-center justify-center gap-2">
+                <span>{loading ? "Loading..." : "Register"}</span>
+              </div>
+            </Buttons>
+  
+        <p className="font-serif text-center text-sm text-gray-700 mt-6">
           Already have an account?{" "}
           <Link
-            className="font-semibold underline hover:text-black"
+            className="font-semibold underline hover:text-[#3498db]"
             to="/login"
           >
             Login

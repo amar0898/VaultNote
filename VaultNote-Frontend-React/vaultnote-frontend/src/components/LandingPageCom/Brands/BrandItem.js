@@ -11,11 +11,11 @@ const BrandItem = ({ text, icon: Icon, title }) => {
       }}
       viewport={{ once: true }}
       transition={{ duration: 0.8 }}
-      className="shadow-sm shadow-btnColor flex flex-col pt-7 pb-10 px-4 items-center gap-3 justify-center"
+      className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 flex flex-col items-center gap-3 justify-center shadow-lg shadow-black rounded-xl"
     >
-      <Icon className="text-slate-700 text-6xl" />
-      <h3 className="text-xl text-slate-700 font-bold">{title}</h3>
-      <p className="text-slate-600 text-center">{text}</p>
+      <Icon className="text-white text-6xl" />
+      <h3 className="text-xl text-white font-bold">{title}</h3>
+      <p className="text-gray-300 text-center">{text}</p>
     </motion.div>
   );
 };

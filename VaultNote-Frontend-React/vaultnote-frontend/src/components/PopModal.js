@@ -4,6 +4,7 @@ import Modal from "@mui/material/Modal";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 export default function Modals({ open, setOpen, noteId }) {
   const navigate = useNavigate();
@@ -14,11 +15,11 @@ export default function Modals({ open, setOpen, noteId }) {
       setNoteDeleteLoader(true);
 
       await api.delete(`/notes/${noteId}`);
-      toast.success("Note Delete successful");
+      showSuccessToast("Your note deleted successfully");
       setOpen(false);
       navigate("/notes");
     } catch (err) {
-      toast.error("Delete Note Failed");
+      showErrorToast("Error while deleting your note!");
     } finally {
       setNoteDeleteLoader(false);
     }

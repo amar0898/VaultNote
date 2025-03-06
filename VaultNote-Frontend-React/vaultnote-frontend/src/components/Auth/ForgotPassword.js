@@ -20,6 +20,7 @@ const ForgotPassword = () => {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -27,6 +28,9 @@ const ForgotPassword = () => {
     },
     mode: "onTouched",
   });
+
+ const email = watch("email");
+ const isFormFilled = email;
 
   const onPasswordForgotHandler = async (data) => {
     //destructuring email from the data object
@@ -67,16 +71,16 @@ const ForgotPassword = () => {
         className="sm:w-[450px] w-[360px]  shadow-custom py-8 sm:px-8 px-4"
       >
         <div>
-          <h1 className="font-montserrat text-center font-bold text-2xl">
-            Forgot Password?
+          <h1 className="font-serif text-center font-bold text-2xl">
+            Forgot Password ?
           </h1>
-          <p className="text-slate-600 text-center">
-            Enter your email a Password reset email will sent
+          <p className="font-serif text-slate-600 text-center">
+            A password reset email will be sent on your registered email address.
           </p>
         </div>
         <Divider className="font-semibold pb-4"></Divider>
 
-        <div className="flex flex-col gap-2 mt-4">
+        <div className="flex flex-col gap-2 mt-4 font-serif">
           <InputField
             label="Email"
             required
@@ -89,14 +93,18 @@ const ForgotPassword = () => {
           />{" "}
         </div>
         <Buttons
-          disabled={loading}
-          onClickhandler={() => {}}
-          className="bg-customRed font-semibold text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-sm my-3"
-          type="text"
-        >
-          {loading ? <span>Loading...</span> : "Send"}
-        </Buttons>
-        <p className=" text-sm text-slate-700 ">
+              disabled={loading || !isFormFilled}
+              onClickhandler={() => {}}
+              className={`font-semibold text-white w-full py-2 transition-colors duration-100 rounded-md my-3 ${
+                isFormFilled ? "bg-[#FF0000] hover:bg-[#2ecc71]" : "bg-[#2c3e50] hover:bg-[#34495e]"
+              }`}
+              type="text"
+            >
+              <div className="font-serif flex items-center justify-center gap-2">
+                <span>{loading ? "Loading..." : "Send"}</span>
+              </div>
+            </Buttons>
+        <p className="font-serif text-sm text-slate-700 ">
           <Link className=" underline hover:text-black" to="/login">
             Back To Login
           </Link>
