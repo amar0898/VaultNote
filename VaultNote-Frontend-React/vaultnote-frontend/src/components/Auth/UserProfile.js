@@ -15,10 +15,12 @@ import { jwtDecode } from "jwt-decode";
 import { Blocks } from "react-loader-spinner";
 import moment from "moment";
 import Errors from "../Errors";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const UserProfile = () => {
   // Access the currentUser and token hook using the useMyContext custom hook from the ContextProvider
   const { currentUser, token } = useMyContext();
+  //const { id } = useParams();
   //set the loggin session from the token
   const [loginSession, setLoginSession] = useState(null);
 
@@ -43,6 +45,11 @@ const UserProfile = () => {
   const [pageLoader, setPageLoader] = useState(false);
   const [disabledLoader, setDisbledLoader] = useState(false);
   const [twofaCodeLoader, settwofaCodeLoader] = useState(false);
+
+  //profile photo
+  const [image, setImage] = useState(null);
+  const [uploading, setUploading] = useState(false);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState(currentUser?.profilePhotoUrl);
 
   const {
     register,
@@ -70,7 +77,7 @@ const UserProfile = () => {
         setIs2faEnabled(response.data.is2faEnabled);
       } catch (error) {
         setPageError(error?.response?.data?.message);
-        toast.error("Error fetching 2FA status");
+        showErrorToast("Error while fetching 2FA status!");
       } finally {
         setPageLoader(false);
       }
@@ -86,7 +93,7 @@ const UserProfile = () => {
       setQrCodeUrl(response.data);
       setStep(2);
     } catch (error) {
-      toast.error("Error enabling 2FA");
+      showErrorToast("Error in enabling 2FA to your account!");
     } finally {
       setDisbledLoader(false);
     }
@@ -101,7 +108,7 @@ const UserProfile = () => {
       setIs2faEnabled(false);
       setQrCodeUrl("");
     } catch (error) {
-      toast.error("Error disabling 2FA");
+      showErrorToast("Error in disabling 2FA to your account!");
     } finally {
       setDisbledLoader(false);
     }
@@ -110,7 +117,7 @@ const UserProfile = () => {
   //verify the 2fa
   const verify2FA = async () => {
     if (!code || code.trim().length === 0)
-      return toast.error("Please Enter The Code To Verify");
+      return showErrorToast("Two-factor authentication code verification failed. Please try again!");
 
     settwofaCodeLoader(true);
 
@@ -123,13 +130,13 @@ const UserProfile = () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-      toast.success("2FA verified successful");
+      showSuccessToast("2FA verified successfully.");
 
       setIs2faEnabled(true);
       setStep(1);
     } catch (error) {
       console.error("Error verifying 2FA", error);
-      toast.error("Invalid 2FA Code");
+      showErrorToast("Invalid 2FA Code!");
     } finally {
       settwofaCodeLoader(false);
     }
@@ -153,9 +160,9 @@ const UserProfile = () => {
       });
 
       //fetchUser();
-      toast.success("Update Credential successful");
+      showSuccessToast("Credentials updated successfully.");
     } catch (error) {
-      toast.error("Update Credential failed");
+      showErrorToast("Credentials updation failed!");
     } finally {
       setLoading(false);
     }
@@ -191,6 +198,28 @@ const UserProfile = () => {
     }
   }, [token]);
 
+  // Fetch profile photo from the backend
+  const fetchProfilePhoto = async () => {
+    try {
+      const response = await api.get(`/auth/${currentUser.id}/get-profile-photo`, {
+        responseType: "blob",
+      });
+      // Convert the blob into an object URL and update the state
+      const imageUrl = URL.createObjectURL(response.data);
+      setProfilePhotoUrl(imageUrl);
+    } catch (error) {
+      console.error("Error fetching profile photo:", error);
+    }
+  };
+
+
+  //// brhbr
+  useEffect(() => {
+    if (currentUser && currentUser.id) {
+      fetchProfilePhoto();
+    }
+  }, [currentUser]);
+
   //update the AccountExpiryStatus
   const handleAccountExpiryStatus = async (event) => {
     setAccountExpired(event.target.checked);
@@ -207,9 +236,9 @@ const UserProfile = () => {
       });
 
       //fetchUser();
-      toast.success("Update Account Expirey Status");
+      showSuccessToast("Account expiry status updated.");
     } catch (error) {
-      toast.error("Update expirey status failed");
+      showErrorToast("Account expiry status updation failed!");
     } finally {
       setLoading(false);
     }
@@ -231,9 +260,9 @@ const UserProfile = () => {
       });
 
       //fetchUser();
-      toast.success("Update Account Lock Status");
+      showSuccessToast("Account lock status updatded.");
     } catch (error) {
-      toast.error("Update Account Lock status failed");
+      showErrorToast("Account lock status updation failed!");
     } finally {
       setLoading(false);
     }
@@ -254,9 +283,9 @@ const UserProfile = () => {
       });
 
       //fetchUser();
-      toast.success("Update Account Enabled Status");
+      showSuccessToast("Account enabled status updated.");
     } catch (error) {
-      toast.error("Update Account Enabled status failed");
+      showErrorToast("Account enable status updation failed!");
     } finally {
       setLoading(false);
     }
@@ -277,9 +306,9 @@ const UserProfile = () => {
       });
 
       //fetchUser();
-      toast.success("Update Credentials Expiry Status");
+      showSuccessToast("Credentials expiry status updated.");
     } catch (error) {
-      toast.error("Credentials Expiry Status Failed");
+      showErrorToast("Credentials expiry status updation Failed");
     } finally {
       setLoading(false);
     }
@@ -297,6 +326,41 @@ const UserProfile = () => {
   const onOpenSettingHandler = () => {
     setOpenSetting(!openSetting);
     setOpenAccount(false);
+  };
+
+  //profile photo feature
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+    setImage(e.target.files[0]);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!image) return showErrorToast("Please select a file to upload");
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", image);
+    formData.append(
+      "user",
+      new Blob([JSON.stringify(currentUser)], { type: "application/json" })
+    );
+
+    try {
+      const response = await api.post(`/auth/${currentUser.id}/upload-profile-photo`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      console.log("Response from upload ",response.data);
+      await fetchProfilePhoto();
+      showSuccessToast("Profile photo updated successfully");
+    } catch (error) {
+      console.error("Error in uploading profile photo: ", error);
+      showErrorToast("Error in uploading profile photo");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -326,18 +390,21 @@ const UserProfile = () => {
             <div className="flex-1  flex flex-col shadow-lg shadow-gray-300 gap-2 px-4 py-6">
               <div className="flex flex-col items-center gap-2   ">
                 <Avatar
-                  alt={currentUser?.username}
-                  src="/static/images/avatar/1.jpg"
+                alt={currentUser?.username}
+                src={profilePhotoUrl || "/default-avatar.png"}
+                sx={{ width: 120, height: 120 }}
                 />
                 <h3 className="font-semibold text-2xl">
                   {currentUser?.username}
                 </h3>
-                <h3 className="font-semibold">
-                    <span className="font-semibold text-2xl">
-                      {currentUser && currentUser["roles"][0]}
-                    </span>
-                  </h3>
+              <input type="file" onChange={handleImageChange} accept="image/*" />
               </div>
+            <Buttons
+            disabled={uploading}
+            onClickhandler={handleUpload}
+            className="mt-4 bg-btnColor text-white px-4 py-2 rounded-md">
+            {uploading ? "Uploading..." : "Update Profile Photo"}
+            </Buttons>
               <div className="my-4 ">
                 <div className="py-3">
                   <Accordion expanded={openAccount}>
@@ -349,7 +416,7 @@ const UserProfile = () => {
                       id="panel1-header"
                     >
                       <h3 className="text-slate-800 text-lg font-semibold ">
-                        Update Account Credentials
+                        Account Details
                       </h3>
                     </AccordionSummary>
                     <AccordionDetails className="shadow-md shadow-gray-300">
@@ -421,15 +488,15 @@ const UserProfile = () => {
                   <span>Multi Factor Authentication</span>
                   <span
                     className={` ${
-                      is2faEnabled ? "bg-green-800" : "bg-customRed"
-                    } px-2 text-center py-1 text-xs mt-2 rounded-sm text-white`}
+                      is2faEnabled ? "bg-green-600" : "bg-customRed"
+                    } px-2 text-center py-1 text-xs mt-1 rounded-md text-white ml-2`}
                   >
                     {is2faEnabled ? "Activated" : "Deactivated"}
                   </span>
                 </h1>{" "}
                 
                 <p className="text-slate-800 text-sm ">
-                 Add a additional layer of security to your account to keep it protected and safe
+                Two-factor authentication adds an additional layer of security to your account to keep it protected and safe by requiring more than just a password to sign in.
                 </p>
               </div>
 
@@ -438,16 +505,16 @@ const UserProfile = () => {
                   disabled={disabledLoader}
                   onClickhandler={is2faEnabled ? disable2FA : enable2FA}
                   className={` ${
-                    is2faEnabled ? "bg-customRed" : "bg-btnColor"
-                  } px-5 py-1 hover:text-slate-300 rounded-sm text-white mt-2`}
+                    is2faEnabled ? "bg-customRed" : "bg-green-600"
+                  } px-5 py-1 hover:text-slate-300 rounded-md my-3 text-white mt-2`}
                 >
                   {disabledLoader ? (
                     <>Loading...</>
                   ) : (
                     <>
                       {is2faEnabled
-                        ? "Disabled Two Factor Authentication"
-                        : "Enable Two Factor Authentication"}
+                        ? "Disabled Two-Factor Authentication"
+                        : "Enable Two-Factor Authentication"}
                     </>
                   )}
                 </Buttons>
@@ -460,8 +527,8 @@ const UserProfile = () => {
                       aria-controls="panel1-content"
                       id="panel1-header"
                     >
-                      <h3 className="font-bold text-lg  text-slate-700 uppercase">
-                        QR Code To Scan
+                      <h3 className="font-bold text-lg  text-slate-700">
+                        Scan the QR code
                       </h3>
                     </AccordionSummary>
                     <AccordionDetails>
@@ -470,17 +537,17 @@ const UserProfile = () => {
                         <div className="flex items-center  gap-2  mt-4">
                           <input
                             type="text"
-                            placeholder="Enter 2FA code"
+                            placeholder="XXXXXX"
                             value={code}
                             required
                             className="mt-4 border px-2 py-1 border-slate-800 rounded-md"
                             onChange={(e) => setCode(e.target.value)}
                           />
                           <button
-                            className="bg-btnColor text-white  px-3 h-10 rounded-md mt-4"
+                            className="bg-green-600 text-white  px-3 h-9 rounded-md mt-4"
                             onClick={verify2FA}
                           >
-                            {twofaCodeLoader ? "Loading..." : "Verify 2FA"}
+                            {twofaCodeLoader ? "Loading..." : "Verify 2FA code"}
                           </button>
                         </div>
                       </div>

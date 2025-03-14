@@ -3,6 +3,7 @@ package com.amardeep.VaultNote.services;
 import com.amardeep.VaultNote.dtos.UserDTO;
 import com.amardeep.VaultNote.models.User;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,4 +42,8 @@ public interface UserService {
     void enable2FA(Long userId);
 
     void disable2FA(Long userId);
+
+    User uploadProfilePhotoUser(Long userId, MultipartFile file);
+
+    User getProfilePhotoByUserId(Long userId);
 }

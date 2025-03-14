@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { useMyContext } from "../../store/ContextApi";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const ForgotPassword = () => {
   const [loading, setLoading] = useState(false);
@@ -51,9 +52,9 @@ const ForgotPassword = () => {
       reset();
 
       //showing success message
-      toast.success("Password reset email sent! Check your inbox.");
+      showSuccessToast("Password reset email sent! Please check your inbox.");
     } catch (error) {
-      toast.error("Error sending password reset email. Please try again.");
+      showErrorToast("Error while sending password reset email. Please try again!");
     } finally {
       setLoading(false);
     }

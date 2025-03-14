@@ -9,6 +9,7 @@ import InputField from "../InputField/InputField";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
+import { showSuccessToast } from "../../utils/toast";
 
 const Signup = () => {
   const apiUrl = process.env.REACT_APP_API_URL;
@@ -64,20 +65,20 @@ const Signup = () => {
     try {
       setLoading(true);
       const response = await api.post("/auth/public/signup", sendData);
-      toast.success("Register Successful");
+      showSuccessToast("Your account created successfully!");
       reset();
       if (response.data) {
         navigate("/login");
       }
     } catch (error) {
       if (
-        error?.response?.data?.message === "Error: Username is already taken!"
+        error?.response?.data?.message === "Error: This username is already taken. Please try different username!"
       ) {
-        setError("username", { message: "username is already taken" });
+        setError("username", { message: "This username is already taken. Please try different username!" });
       } else if (
-        error?.response?.data?.message === "Error: Email is already in use!"
+        error?.response?.data?.message === "Error: This email is already taken. Please try with different email!"
       ) {
-        setError("email", { message: "Email is already in use" });
+        setError("email", { message: "This email is already taken. Please try with different email!" });
       }
     } finally {
       setLoading(false);

@@ -10,6 +10,7 @@ import Divider from "@mui/material/Divider";
 import Buttons from "../../utils/Buttons";
 import toast from "react-hot-toast";
 import { useMyContext } from "../../store/ContextApi";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const apiUrl = process.env.REACT_APP_API_URL;
 
@@ -65,7 +66,7 @@ const Login = () => {
     try {
       setLoading(true);
       const response = await api.post("/auth/public/signin", data);
-      toast.success("Login Successful");
+      showSuccessToast("Logged in successfully!");
       reset();
       if (response.status === 200 && response.data.jwtToken) {
         setJwtToken(response.data.jwtToken);
@@ -76,11 +77,11 @@ const Login = () => {
           handleSuccessfulLogin(response.data.jwtToken, decodedToken);
         }
       } else {
-        toast.error("Login failed. Please check your credentials and try again.");
+        showErrorToast("Login failed. Please check your email or password and try again!");
       }
     } catch (error) {
       if (error) {
-        toast.error("Invalid credentials");
+        showErrorToast("Invalid credentials!");
       }
     } finally {
       setLoading(false);
@@ -103,7 +104,7 @@ const Login = () => {
       handleSuccessfulLogin(jwtToken, decodedToken);
     } catch (error) {
       console.error("2FA verification error", error);
-      toast.error("Invalid 2FA code. Please try again.");
+      showErrorToast("Invalid 2FA code. Please check and try to log in again!");
     } finally {
       setLoading(false);
     }

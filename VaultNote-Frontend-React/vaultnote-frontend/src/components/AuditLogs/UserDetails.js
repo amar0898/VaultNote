@@ -7,6 +7,7 @@ import { Blocks } from "react-loader-spinner";
 import Buttons from "../../utils/Buttons";
 import toast from "react-hot-toast";
 import Errors from "../Errors";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const UserDetails = () => {
   const {
@@ -91,10 +92,10 @@ const UserDetails = () => {
         },
       });
       fetchUserDetails();
-      toast.success("Update role successful");
+      showSuccessToast("Role updated successfully.");
     } catch (err) {
       console.log(err);
-      toast.error("Update Role Failed");
+      showErrorToast("Failed to update the role!");
     } finally {
       setUpdateRoleLoader(false);
     }
@@ -118,9 +119,9 @@ const UserDetails = () => {
       setIsEditingPassword(false);
       setValue("password", "");
       //fetchUserDetails();
-      toast.success("password update success");
+      showSuccessToast("Password updated successfully.");
     } catch (err) {
-      toast.error("Error updating password " + err.response.data);
+      showErrorToast("Error in updating your password " + err.response.data);
     } finally {
       setPasswordLoader(false);
     }
@@ -152,9 +153,9 @@ const UserDetails = () => {
         },
       });
       fetchUserDetails();
-      toast.success(message);
+      showSuccessToast(message);
     } catch (err) {
-      toast.error(err?.response?.data?.message);
+      showErrorToast(err?.response?.data?.message);
       console.log(`Error updating ${name}:`);
     } finally {
       message = null;

@@ -8,6 +8,7 @@ import moment from "moment";
 import { Link } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
 import { MdDateRange } from "react-icons/md";
+import { showErrorToast } from "../../utils/toast";
 
 //Material ui data grid has used for the table
 //initialize the columns for the tables and (field) value is used to show data in a specific column dynamically
@@ -122,7 +123,7 @@ const UserList = () => {
       } catch (err) {
         setError(err?.response?.data?.message);
 
-        toast.error("Error fetching users", err);
+        showErrorToast("Error in fetching the users", err);
       } finally {
         setLoading(false);
       }

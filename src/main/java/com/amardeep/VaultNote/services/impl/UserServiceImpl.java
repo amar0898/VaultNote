@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -207,6 +209,26 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
         user.setTwoFactorEnabled(false);
         userRepository.save(user);
+    }
+
+    @Override
+    public User uploadProfilePhotoUser(Long userId, MultipartFile file) {
+            User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
+            user.setProfilePhotoName(file.getOriginalFilename());
+            user.setProfilePhotoType(file.getContentType());
+        try {
+            user.setProfilePhotoData(file.getBytes());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User getProfilePhotoByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
+        return user;
     }
 
 

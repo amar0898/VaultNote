@@ -6,6 +6,7 @@ import { Divider } from "@mui/material";
 import InputField from "../InputField/InputField";
 import toast from "react-hot-toast";
 import Buttons from "../../utils/Buttons";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const ResetPassword = () => {
   const {
@@ -44,10 +45,10 @@ const ResetPassword = () => {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
-      toast.success("Password reset successful! You can now log in.");
+      showSuccessToast("Password reset successfully. You can now log in to your account.");
       reset();
     } catch (error) {
-      toast.error("Error resetting password. Please try again.");
+      showErrorToast("Error while resetting your password. Please check and try again!");
     } finally {
       setLoading(false);
     }

@@ -8,6 +8,7 @@ import { auditLogsTruncateTexts } from "../../utils/truncateText.js";
 import Errors from "../Errors.js";
 import moment from "moment";
 import { MdDateRange } from "react-icons/md";
+import { showErrorToast } from "../../utils/toast";
 
 //Material ui data grid has used for the table
 //initialize the columns for the tables and (field) value is used to show data in a specific column dynamically
@@ -130,7 +131,7 @@ const AdminAuditLogs = () => {
       setAuditLogs(response.data);
     } catch (err) {
       setError(err?.response?.data?.message);
-      toast.error("Error fetching audit logs");
+      showErrorToast("Error in fetching audit logs!");
     } finally {
       setLoading(false);
     }

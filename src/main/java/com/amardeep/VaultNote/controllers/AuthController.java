@@ -16,9 +16,12 @@ import com.amardeep.VaultNote.services.TotpService;
 import com.amardeep.VaultNote.services.UserService;
 import com.amardeep.VaultNote.util.AuthUtil;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import jakarta.servlet.ServletContext;
+import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,12 +32,17 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.beans.factory.annotation.Value;
 
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -65,6 +73,12 @@ public class AuthController {
 
     @Autowired
     TotpService totpService;
+
+    @Autowired
+    private ServletContext servletContext;
+
+    @Value("${file.upload-dir}")
+    private String upload_Dir;
 
     @PostMapping("/public/signin")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
@@ -241,5 +255,25 @@ public class AuthController {
         }
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid 2FA code");
+    }
+
+    @PostMapping("/{userId}/upload-profile-photo")
+    public ResponseEntity<?> uploadProfilePhoto(@PathVariable Long userId, @RequestParam("file") MultipartFile file) {
+        try {
+            User user = userService.uploadProfilePhotoUser(userId, file);
+            return new ResponseEntity<>(user, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{userId}/get-profile-photo")
+    public ResponseEntity<byte[]> getProfilePhotoByUserId(@PathVariable Long userId) {
+        User user = userService.getProfilePhotoByUserId(userId);
+        byte[] imageFile = user.getProfilePhotoData();
+
+        return ResponseEntity.ok().contentType(MediaType.valueOf(user.getProfilePhotoType())).body(imageFile);
+
     }
 }

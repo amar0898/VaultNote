@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState } from "react";
 import { useEffect } from "react";
 import api from "../services/api";
-import toast from "react-hot-toast";
+import { showSuccessToast, showErrorToast } from "../utils/toast";
 
 const ContextApi = createContext();
 
@@ -43,7 +43,7 @@ export const ContextProvider = ({ children }) => {
         setCurrentUser(data);
       } catch (error) {
         console.error("Error fetching current user", error);
-        toast.error("Error fetching current user");
+        showSuccessToast("Error in fetching the current user!");
       }
     }
   };

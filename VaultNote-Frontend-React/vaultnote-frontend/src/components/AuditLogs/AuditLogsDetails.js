@@ -5,6 +5,7 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Blocks } from "react-loader-spinner";
 import Errors from "../Errors.js";
 import moment from "moment";
+import { showErrorToast } from "../../utils/toast";
 
 //importing the the columns from the auditlogs
 import { auditLogscolumn } from "../../utils/tableColumn.js";
@@ -23,7 +24,7 @@ const AuditLogsDetails = () => {
 
       setAuditLogs(data);
     } catch (err) {
-      setError(err?.response?.data?.message);
+      showErrorToast(err?.response?.data?.message);
       console.log(err);
     } finally {
       setLoading(false);

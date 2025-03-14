@@ -4,7 +4,7 @@ import Modal from "@mui/material/Modal";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import api from "../services/api";
-import { showSuccessToast, showErrorToast } from "../../utils/toast";
+import { showSuccessToast, showErrorToast } from "../utils/toast";
 
 export default function Modals({ open, setOpen, noteId }) {
   const navigate = useNavigate();
