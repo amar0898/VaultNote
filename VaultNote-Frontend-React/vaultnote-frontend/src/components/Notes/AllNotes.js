@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import api from "../../services/api";
 import NoteItems from "./NoteItems";
-import { FiFilePlus } from "react-icons/fi";
+import { FiFilePlus, FiSearch, FiAlertCircle } from "react-icons/fi";
 import { Blocks } from "react-loader-spinner";
 import Errors from "../Errors";
 
@@ -10,15 +10,15 @@ const AllNotes = () => {
   const [notes, setNotes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [query, setQuery] = useState("");
 
   const fetchNotes = async () => {
     setLoading(true);
     try {
       const response = await api.get("/notes");
-
       const parsedNotes = response.data.map((note) => ({
         ...note,
-        parsedContent: JSON.parse(note.content).content, // Assuming each note's content is JSON-formatted.
+        parsedContent: JSON.parse(note.content).content,
       }));
       setNotes(parsedNotes);
     } catch (error) {
@@ -30,25 +30,41 @@ const AllNotes = () => {
   };
 
   useEffect(() => {
-    //calling the function here to fetch all notes
     fetchNotes();
   }, []);
 
-  //to show an errors
+  const filteredNotes = notes.filter((note) =>
+    note.parsedContent.toLowerCase().includes(query.toLowerCase())
+  );
+
   if (error) {
     return <Errors message={error} />;
   }
 
   return (
     <div className="min-h-[calc(100vh-74px)] sm:py-10 sm:px-5 px-0 py-4">
-      <div className="w-[92%] mx-auto ">
-        {!loading && notes && notes?.length > 0 && (
-          <h1 className="font-montserrat  text-slate-800 sm:text-4xl text-2xl font-semibold ">
-            My Notes
-          </h1>
+      <div className="w-[92%] mx-auto">
+        {!loading && notes && notes.length > 0 && (
+          <>
+            <h1 className="font-montserrat text-slate-800 sm:text-4xl text-2xl font-semibold">
+              My Notes
+            </h1>
+            <div className="flex justify-center my-4">
+              <div className="relative w-full sm:w-1/2">
+                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search your notes....."
+                  className="pl-10 p-2 border border-gray-300 rounded-md w-full"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+            </div>
+          </>
         )}
         {loading ? (
-          <div className="flex  flex-col justify-center items-center  h-72">
+          <div className="flex flex-col justify-center items-center h-72">
             <span>
               <Blocks
                 height="70"
@@ -64,8 +80,8 @@ const AllNotes = () => {
           </div>
         ) : (
           <>
-            {notes && notes?.length === 0 ? (
-              <div className="flex flex-col items-center justify-center min-h-96  p-4">
+            {notes && notes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center min-h-96 p-4">
                 <div className="text-center">
                   <h2 className="text-2xl font-bold text-gray-800 mb-4">
                     You didn't create any note yet
@@ -75,7 +91,7 @@ const AllNotes = () => {
                   </p>
                   <div className="w-full flex justify-center">
                     <Link to="/create-note">
-                      <button className="flex items-center px-4 py-2 bg-btnColor text-white rounded  focus:outline-none focus:ring-2 focus:ring-blue-300">
+                      <button className="flex items-center px-4 py-2 bg-btnColor text-white rounded focus:outline-none focus:ring-2 focus:ring-blue-300">
                         <FiFilePlus className="mr-2" size={24} />
                         Create New Note
                       </button>
@@ -83,14 +99,17 @@ const AllNotes = () => {
                   </div>
                 </div>
               </div>
+            ) : query.trim() !== "" && filteredNotes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-72">
+                <FiAlertCircle size={48} className="text-gray-500" />
+                <p className="text-gray-500 mt-4">No notes found matching your search.</p>
+              </div>
             ) : (
-              <>
-                <div className="pt-10 grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-y-10 gap-x-5 justify-center">
-                  {notes.map((item) => (
-                    <NoteItems key={item.id} {...item} id={item.id} />
-                  ))}
-                </div>
-              </>
+              <div className="pt-10 grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-y-10 gap-x-5 justify-center">
+                {filteredNotes.map((item) => (
+                  <NoteItems key={item.id} {...item} id={item.id} />
+                ))}
+              </div>
             )}
           </>
         )}
@@ -100,3 +119,4 @@ const AllNotes = () => {
 };
 
 export default AllNotes;
+
