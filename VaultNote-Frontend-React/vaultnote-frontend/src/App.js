@@ -21,6 +21,7 @@ import ForgotPassword from "./components/Auth/ForgotPassword";
 import NotFound from "./components/NotFound";
 import ResetPassword from "./components/Auth/ResetPassword";
 import Footer from "./components/Footer/Footer";
+import VerifyCode from "./components/Auth/VerifyCode";
 
 const App = () => {
   return (
@@ -35,6 +36,7 @@ const App = () => {
     <Route path="/contact" element={<ContactPage />} />
     <Route path="/about" element={<AboutPage />} />
     <Route path="/reset-password" element={<ResetPassword />} />
+    <Route path="/verify-code" element={<VerifyCode />} />
     <Route
           path="/notes/:id"
           element={

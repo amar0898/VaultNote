@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import api from "../../services/api";
 import { useMyContext } from "../../store/ContextApi";
 import Avatar from "@mui/material/Avatar";
@@ -20,8 +21,9 @@ import { showSuccessToast, showErrorToast } from "../../utils/toast";
 const UserProfile = () => {
   // Access the currentUser and token hook using the useMyContext custom hook from the ContextProvider
   const { currentUser, token } = useMyContext();
+  const navigate = useNavigate();
   //const { id } = useParams();
-  //set the loggin session from the token
+  //set the loggin session from the token 
   const [loginSession, setLoginSession] = useState(null);
 
   const [credentialExpireDate, setCredentialExpireDate] = useState(null);
@@ -142,27 +144,38 @@ const UserProfile = () => {
     }
   };
 
-  //update the credentials
+  //update the user profile credentials
   const handleUpdateCredential = async (data) => {
     const newUsername = data.username;
     const newPassword = data.password;
 
+    // Check if the user has provided any change. If neither is updated, show error.
+  if (!newUsername && !newPassword) {
+    return showErrorToast("Please enter a new username or new password to update!");
+  }
+
     try {
       setLoading(true);
       const formData = new URLSearchParams();
-      formData.append("token", token);
-      formData.append("newUsername", newUsername);
-      formData.append("newPassword", newPassword);
-      await api.post("/auth/update-credentials", formData, {
+      formData.append("currentUsername", currentUser.username);
+      if (newUsername && newUsername !== currentUser.username) {
+        formData.append("newUsername", newUsername);
+      }
+      if (newPassword) {
+        formData.append("newPassword", newPassword);
+      }
+      await api.post("/auth/send-verification-code", formData, {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
       });
 
       //fetchUser();
-      showSuccessToast("Credentials updated successfully.");
+      showSuccessToast("A verification code has been sent to your email. Please verify it to update your credentials.");
+      navigate("/verify-code");
     } catch (error) {
-      showErrorToast("Credentials updation failed!");
+      console.log(error);
+      showErrorToast("Failed to send verification code for credentials update!");
     } finally {
       setLoading(false);
     }
@@ -416,7 +429,7 @@ const UserProfile = () => {
                       id="panel1-header"
                     >
                       <h3 className="text-slate-800 text-lg font-semibold ">
-                        Account Details
+                        Edit Profile
                       </h3>
                     </AccordionSummary>
                     <AccordionDetails className="shadow-md shadow-gray-300">

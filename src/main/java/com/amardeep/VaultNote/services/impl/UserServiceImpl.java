@@ -1,28 +1,37 @@
 package com.amardeep.VaultNote.services.impl;
 
+import com.amardeep.VaultNote.config.RedisConfig;
 import com.amardeep.VaultNote.dtos.UserDTO;
-import com.amardeep.VaultNote.models.AppRole;
-import com.amardeep.VaultNote.models.PasswordResetToken;
-import com.amardeep.VaultNote.models.Role;
-import com.amardeep.VaultNote.models.User;
+import com.amardeep.VaultNote.models.*;
 import com.amardeep.VaultNote.repositories.PasswordResetTokenRepository;
 import com.amardeep.VaultNote.repositories.RoleRepository;
 import com.amardeep.VaultNote.repositories.UserRepository;
+import com.amardeep.VaultNote.security.jwt.JwtUtils;
 import com.amardeep.VaultNote.services.TotpService;
 import com.amardeep.VaultNote.services.UserService;
 import com.amardeep.VaultNote.util.EmailService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 
 @Service
@@ -32,22 +41,36 @@ public class UserServiceImpl implements UserService {
     String frontendUrl;
 
     @Autowired
-    UserRepository userRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
-    PasswordResetTokenRepository passwordResetTokenRepository;
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
-    TotpService totpService;
+    private TotpService totpService;
+
+    @Autowired
+    private JwtUtils jwtUtils;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @Value("${spring.mail.username}")
+    String from;
 
     @Override
     public void updateUserRole(Long userId, String roleName) {
@@ -231,5 +254,103 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Override
+    public boolean sendVerificationCode(MultiValueMap<String, String> formData) throws JsonProcessingException {
 
+        String currentUsername = formData.getFirst("currentUsername");
+        String newUsername = formData.getFirst("newUsername");
+        String newPassword = formData.getFirst("newPassword");
+
+        // Validate JWT token and retrieve the user from token
+        //String username = jwtUtils.getUserNameFromJwtToken(token);
+        User user = userRepository.findByUserName(currentUsername).orElseThrow(()->new RuntimeException("User not found"));
+        if (user == null) {
+            return false;
+        }
+
+        // Generate a unique 6-digit verification code
+        String code = String.format("%06d", new Random().nextInt(1000000));
+
+        UpdateDataRedis updateDataRedis = new UpdateDataRedis();
+        updateDataRedis.setVerificationCode(code);
+        updateDataRedis.setCurrentUsername(currentUsername);
+        updateDataRedis.setNewUsername(newUsername);
+        updateDataRedis.setNewPassword(newPassword);
+
+        String updateDataJson = mapper.writeValueAsString(updateDataRedis);
+
+        // Save the code in Redis with a TTL of 3 minutes.
+        // Key format: verificationCode:{userId}
+        String key = "verificationCode:" + user.getUserId();
+        redisTemplate.opsForValue().set(key, updateDataJson, Duration.ofMinutes(3));
+
+        // Prepare and send the verification send email
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(user.getEmail());
+        message.setFrom(from);
+        message.setSubject("VaultNote - Verification Code for Updating Profile Credentials");
+        message.setText("Hello " + user.getUserName() + ",\n\n"
+                + "Your verification code is: " + code + "\n"
+                + "This code will expire in 3 minutes.\n\n"
+                + "If you did not request a profile credentials update, please ignore this email.\n\n"
+                + "Regards,\nVaultNote Team");
+
+        try {
+            mailSender.send(message);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public boolean verifyCode(MultiValueMap<String, String> formData) {
+        String codeInput = formData.getFirst("code");
+        String currentUsername = formData.getFirst("currentUsername");
+        if (codeInput.trim().isEmpty()) {
+            return false;
+        }
+
+        User user = userRepository.findByUserName(currentUsername).orElseThrow(()->new RuntimeException("User not found"));
+        if (user == null) {
+            return false;
+        }
+
+        String key = "verificationCode:" + user.getUserId();
+        String storedJson = redisTemplate.opsForValue().get(key);
+        if (storedJson == null) {
+            return false;
+        }
+
+        UpdateDataRedis updateDataRedis;
+        try {
+            updateDataRedis = mapper.readValue(storedJson, UpdateDataRedis.class);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (!updateDataRedis.getVerificationCode().equals(codeInput)) {
+            return false;
+        }
+
+        if (updateDataRedis.getNewUsername() != null && !updateDataRedis.getNewUsername().isEmpty()
+                && !updateDataRedis.getNewUsername().equals(user.getUserName())) {
+            user.setUserName(updateDataRedis.getNewUsername());
+        }
+
+        if (updateDataRedis.getNewPassword() != null && !updateDataRedis.getNewPassword().isEmpty()) {
+            String encodedPassword = passwordEncoder.encode(updateDataRedis.getNewPassword());
+            user.setPassword(encodedPassword);
+        }
+
+        userRepository.save(user);
+
+        redisTemplate.delete(key);
+
+        // Optionally, you might want to invalidate the user session or JWT here
+        return true;
+    }
 }

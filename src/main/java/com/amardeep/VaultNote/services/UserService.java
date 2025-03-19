@@ -2,7 +2,9 @@ package com.amardeep.VaultNote.services;
 
 import com.amardeep.VaultNote.dtos.UserDTO;
 import com.amardeep.VaultNote.models.User;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -46,4 +48,8 @@ public interface UserService {
     User uploadProfilePhotoUser(Long userId, MultipartFile file);
 
     User getProfilePhotoByUserId(Long userId);
+
+    boolean sendVerificationCode(MultiValueMap<String, String> formData) throws JsonProcessingException;
+
+    boolean verifyCode(MultiValueMap<String, String> formData);
 }

@@ -189,7 +189,7 @@ const Login = () => {
                 isFormFilled ? "bg-[#27ae60] hover:bg-[#2ecc71]" : "bg-[#2c3e50] hover:bg-[#34495e]"
               }`}
               type="text"
-            >.
+            >
               <div className="font-serif flex items-center justify-center gap-2">
                 <span>{loading ? "Loading..." : "Log In"}</span>
               </div>

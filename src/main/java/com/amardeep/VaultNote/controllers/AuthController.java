@@ -15,8 +15,10 @@ import com.amardeep.VaultNote.security.services.UserDetailsImpl;
 import com.amardeep.VaultNote.services.TotpService;
 import com.amardeep.VaultNote.services.UserService;
 import com.amardeep.VaultNote.util.AuthUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.warrenstrange.googleauth.GoogleAuthenticatorKey;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Path;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Value;
@@ -276,4 +279,25 @@ public class AuthController {
         return ResponseEntity.ok().contentType(MediaType.valueOf(user.getProfilePhotoType())).body(imageFile);
 
     }
+
+    @PostMapping("/send-verification-code")
+    public ResponseEntity<?> sendVerificationCode(@RequestParam MultiValueMap<String, String> formData) throws JsonProcessingException {
+
+        boolean message = userService.sendVerificationCode(formData);
+        if(message){
+            return ResponseEntity.ok("Verification code sent to your email.");
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to send verification code to your email");
+    }
+
+    @PostMapping("/verify-verification-code")
+    public ResponseEntity<?> verifyCode(@RequestBody MultiValueMap<String, String> formData) {
+        boolean message = userService.verifyCode(formData);
+        if(message){
+            return ResponseEntity.ok("Your credentials updated successfully. Please log in again.");
+        }
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Invalid verification code. Please try again.");
+    }
+
+
 }

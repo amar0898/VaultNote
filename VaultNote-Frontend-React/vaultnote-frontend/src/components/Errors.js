@@ -14,7 +14,7 @@ const Errors = ({ message }) => {
           <FiAlertCircle className="text-red-500 mb-4" size={48} />
         </div>
         <h2 className="text-2xl font-bold text-gray-800 mb-4">
-          Oops! Something went wrong.
+          Oops! Something went wrong. Please login to your account!
         </h2>
         <p className="text-gray-600 mb-6 font-semibold">{message}</p>
         <div className="flex justify-center">
