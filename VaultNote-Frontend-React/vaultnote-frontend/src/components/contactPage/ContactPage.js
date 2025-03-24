@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import Buttons from "../../utils/Buttons";
+import api from "../../services/api";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const ContactPage = () => {
   const [loading, setLoading] = useState(false);
 
-  // Initialize React Hook Form
   const {
     register,
     handleSubmit,
+    reset,
     watch,
     formState: { errors },
   } = useForm({
@@ -20,18 +22,26 @@ const ContactPage = () => {
     mode: "onTouched",
   });
 
-  // Watch the input values from react-hook-form
   const name = watch("name");
   const email = watch("email");
   const message = watch("message");
 
-  // The button should be enabled only when all fields have a value
   const isFormFilled = name && email && message;
 
-  // onSubmitHandler will be called when the form is valid and submitted
-  const onSubmitHandler = (data) => {
+  const onSubmitHandler = async (data) => {
     //console.log("Form Data:", data);
-    // You can add your submission logic here.
+    try {
+      setLoading(true);
+      const response = await api.post("/contact", data);
+      showSuccessToast("Your message has been sent successfully. We will get back to you soon!");
+      reset();
+    } catch (error) {
+      const errMessage = error?.response?.data?.message || "Failed to send message";
+      showErrorToast(errMessage);
+    } finally {
+      setLoading(false);
+    }
+    
   };
 
   return (

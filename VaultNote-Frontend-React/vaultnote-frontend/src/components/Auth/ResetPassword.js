@@ -6,6 +6,7 @@ import { Divider } from "@mui/material";
 import InputField from "../InputField/InputField";
 import toast from "react-hot-toast";
 import Buttons from "../../utils/Buttons";
+import { useNavigate } from "react-router-dom";
 import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const ResetPassword = () => {
@@ -23,6 +24,7 @@ const ResetPassword = () => {
     mode: "onTouched",
   });
 
+  const navigate = useNavigate();
   const password = watch("password");
   const isFormFilled = password;
 
@@ -47,6 +49,7 @@ const ResetPassword = () => {
       });
       showSuccessToast("Password reset successfully. You can now log in to your account.");
       reset();
+      navigate("/login");
     } catch (error) {
       showErrorToast("Error while resetting your password. Please check and try again!");
     } finally {

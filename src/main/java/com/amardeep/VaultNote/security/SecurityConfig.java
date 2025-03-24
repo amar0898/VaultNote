@@ -68,16 +68,17 @@ public class SecurityConfig {
         //http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                // .ignoringRequestMatchers("/api/auth/public/**","/api/csrf-token"));
                 http.csrf(csrf -> csrf.disable());
+                http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
                 http.authorizeHttpRequests((requests) ->
                 requests.requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/csrf-token").permitAll()
                         .requestMatchers("/api/auth/public/**").permitAll()
+                        .requestMatchers("/api/contact").permitAll()
                         .requestMatchers("/oauth2/**").permitAll()
                         .anyRequest().authenticated())
                         .oauth2Login(oauth2 -> {
                           oauth2.successHandler(loginSuccessHandler);
                          });
-        //http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
         http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
         http.formLogin(Customizer.withDefaults());

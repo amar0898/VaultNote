@@ -53,6 +53,7 @@ const ForgotPassword = () => {
 
       //showing success message
       showSuccessToast("Password reset email sent! Please check your inbox.");
+      navigate("/login");
     } catch (error) {
       showErrorToast("Error while sending password reset email. Please try again!");
     } finally {

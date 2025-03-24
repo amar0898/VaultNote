@@ -77,11 +77,11 @@ const Login = () => {
           handleSuccessfulLogin(response.data.jwtToken, decodedToken);
         }
       } else {
-        showErrorToast("Login failed. Please check your email or password and try again!");
+        showErrorToast("Login failed. Please check your username or password and try again!");
       }
     } catch (error) {
       if (error) {
-        showErrorToast("Invalid credentials!");
+        showErrorToast("There is no account with this username or password. Please check your credentials and try again!");
       }
     } finally {
       setLoading(false);
