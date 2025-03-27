@@ -12,16 +12,11 @@ import Errors from "../Errors";
 import toast from "react-hot-toast";
 import Modals from "../PopModal";
 import { showSuccessToast, showErrorToast } from "../../utils/toast";
-//importing the the columns from the auditlogs
 import { auditLogscolumn } from "../../utils/tableColumn";
 
 const NoteDetails = () => {
   const { id } = useParams();
-  //open modal for deleteing a note
-  const [modalOpen, setModalOpen] = useState(false);
-
   const [note, setNote] = useState(null);
-
   const [editorContent, setEditorContent] = useState(note?.parsedContent);
   const [auditLogs, setAuditLogs] = useState([]);
   const [error, setError] = useState(null);
@@ -37,7 +32,7 @@ const NoteDetails = () => {
       const response = await api.get("/notes");
       const foundNote = response.data.find((n) => n.id.toString() === id);
       if (foundNote) {
-        foundNote.parsedContent = JSON.parse(foundNote.content).content; // Parse content
+        foundNote.parsedContent = JSON.parse(foundNote.content).content;
         setNote(foundNote);
       } else {
         setError("Invalid Note");
@@ -52,7 +47,7 @@ const NoteDetails = () => {
 
   const checkAdminRole = async () => {
     try {
-      const response = await api.get("/auth/user"); // Adjust the endpoint as necessary to get user info
+      const response = await api.get("/auth/user");
       const roles = response.data.roles;
       if (roles.includes("ROLE_ADMIN")) {
         setIsAdmin(true);
@@ -90,14 +85,9 @@ const NoteDetails = () => {
   }, [note?.parsedContent]);
 
   const rows = auditLogs.map((item) => {
-    //moment npm package is used to format the date
-
     const formattedDate = moment(item.timestamp).format(
       "MMMM DD, YYYY, hh:mm A"
     );
-
-    //set the data for each rows in the table according to the field name in columns
-    //Example: username is the keyword in row it should matche with the field name in column so that the data will show on that column dynamically
 
     return {
       id: item.id,
@@ -110,8 +100,6 @@ const NoteDetails = () => {
     };
   });
 
-  //if there is an error
-
   if (error) {
     return <Errors message={error} />;
   }
@@ -120,7 +108,6 @@ const NoteDetails = () => {
     setEditorContent(content);
   };
 
-  //edit the note content
   const onNoteEditHandler = async () => {
     if (editorContent.trim().length === 0) {
       return showErrorToast("Add some content to your note!");
@@ -137,6 +124,7 @@ const NoteDetails = () => {
       if (isAdmin) {
         fetchAuditLogs();
       }
+      navigate("/notes");
     } catch (err) {
       showErrorToast("Error while updating your note");
     } finally {
@@ -144,7 +132,6 @@ const NoteDetails = () => {
     }
   };
 
-  //navigate to the previous page
   const onBackHandler = () => {
     navigate(-1);
   };
@@ -174,14 +161,6 @@ const NoteDetails = () => {
                     className="bg-customRed text-white px-3 py-1 rounded-md"
                   >
                     Cancel
-                  </Buttons>
-                )}
-                {!editEnable && (
-                  <Buttons
-                    onClickhandler={() => setModalOpen(true)}
-                    className="bg-customRed text-white px-3 py-1 rounded-md"
-                  >
-                    Delete
                   </Buttons>
                 )}
               </div>
@@ -264,7 +243,6 @@ const NoteDetails = () => {
           )}
         </>
       </div>
-      <Modals open={modalOpen} setOpen={setModalOpen} noteId={id} />
     </div>
   );
 };

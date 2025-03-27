@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect } from "react";
 import { AiOutlineWarning } from "react-icons/ai";
 import Modal from "@mui/material/Modal";
 import toast from "react-hot-toast";
@@ -6,16 +6,16 @@ import { useNavigate } from "react-router-dom";
 import api from "../services/api";
 import { showSuccessToast, showErrorToast } from "../utils/toast";
 
-export default function Modals({ open, setOpen, noteId }) {
+export default function Modals({ open, setOpen, noteId, onNoteDeleted }) {
   const navigate = useNavigate();
   const [noteDeleteLoader, setNoteDeleteLoader] = React.useState(false);
 
   const onNoteDeleteHandler = async () => {
     try {
       setNoteDeleteLoader(true);
-
       await api.delete(`/notes/${noteId}`);
       showSuccessToast("Your note deleted successfully");
+      onNoteDeleted();
       setOpen(false);
       navigate("/notes");
     } catch (err) {
@@ -38,7 +38,7 @@ export default function Modals({ open, setOpen, noteId }) {
               <AiOutlineWarning className="text-red-600 text-2xl" />
             </div>
             <p className="mt-4 text-white text-center">
-              Are you sure you want to delete this note?
+              Are you sure you want to delete this note ?
             </p>
             <div className="mt-6 flex justify-center space-x-4">
               <button

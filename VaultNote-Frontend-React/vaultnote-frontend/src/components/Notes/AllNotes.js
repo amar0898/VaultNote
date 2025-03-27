@@ -5,6 +5,7 @@ import NoteItems from "./NoteItems";
 import { FiFilePlus, FiSearch, FiAlertCircle } from "react-icons/fi";
 import { Blocks } from "react-loader-spinner";
 import Errors from "../Errors";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const AllNotes = () => {
   const [notes, setNotes] = useState([]);
@@ -36,6 +37,10 @@ const AllNotes = () => {
   const filteredNotes = notes.filter((note) =>
     note.parsedContent.toLowerCase().includes(query.toLowerCase())
   );
+
+  const handleNoteDeleted = () => {
+      fetchNotes();
+  };
 
   if (error) {
     return <Errors message={error} />;
@@ -107,7 +112,7 @@ const AllNotes = () => {
             ) : (
               <div className="pt-10 grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-y-10 gap-x-5 justify-center">
                 {filteredNotes.map((item) => (
-                  <NoteItems key={item.id} {...item} id={item.id} />
+                  <NoteItems key={item.id} {...item} id={item.id} onDelete={handleNoteDeleted} />
                 ))}
               </div>
             )}
