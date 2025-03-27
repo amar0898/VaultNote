@@ -1,11 +1,14 @@
 package com.amardeep.VaultNote.services.impl;
+import com.amardeep.VaultNote.models.AuditLog;
 import com.amardeep.VaultNote.models.Note;
 import com.amardeep.VaultNote.repositories.NoteRepository;
+import com.amardeep.VaultNote.services.AuditLogKafkaProducer;
 import com.amardeep.VaultNote.services.AuditLogService;
 import com.amardeep.VaultNote.services.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -15,7 +18,7 @@ public class NoteServiceImpl implements NoteService {
     private NoteRepository noteRepository;
 
     @Autowired
-    private AuditLogService auditLogService;
+    private AuditLogKafkaProducer auditLogKafkaProducer;
 
     @Override
     public Note createNoteForUser(String username, String content) {
@@ -23,7 +26,15 @@ public class NoteServiceImpl implements NoteService {
         note.setContent(content);
         note.setOwnerUsername(username);
         Note savedNote = noteRepository.save(note);
-        auditLogService.logNoteCreation(username,note);
+
+        AuditLog auditLog = new AuditLog();
+        auditLog.setAction("CREATE");
+        auditLog.setUsername(username);
+        auditLog.setNoteId(savedNote.getId());
+        auditLog.setNoteContent(content);
+        auditLog.setTimestamp(LocalDateTime.now());
+        auditLogKafkaProducer.sendAuditLog(auditLog);
+
         return savedNote;
     }
 
@@ -33,14 +44,29 @@ public class NoteServiceImpl implements NoteService {
                 -> new RuntimeException("Note not found"));
         note.setContent(content);
         Note updatedNote = noteRepository.save(note);
-        auditLogService.logNoteUpdate(username,note);
+
+        AuditLog auditLog = new AuditLog();
+        auditLog.setAction("UPDATE");
+        auditLog.setUsername(username);
+        auditLog.setNoteId(updatedNote.getId());
+        auditLog.setNoteContent(content);
+        auditLog.setTimestamp(LocalDateTime.now());
+        auditLogKafkaProducer.sendAuditLog(auditLog);
+
         return updatedNote;
     }
 
     @Override
     public void deleteNoteForUser(Long noteId, String username) {
         Note note = noteRepository.findById(noteId).orElseThrow(()->new RuntimeException("Note not found"));
-        auditLogService.logNoteDeletion(username,noteId);
+
+        AuditLog auditLog = new AuditLog();
+        auditLog.setAction("DELETE");
+        auditLog.setUsername(username);
+        auditLog.setNoteId(noteId);
+        auditLog.setTimestamp(LocalDateTime.now());
+        auditLogKafkaProducer.sendAuditLog(auditLog);
+
         noteRepository.delete(note);
     }
 
