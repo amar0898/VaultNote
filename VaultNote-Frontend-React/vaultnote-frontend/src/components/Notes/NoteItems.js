@@ -1,19 +1,50 @@
 import React, { useState } from "react";
-import { MdEdit,MdDelete } from "react-icons/md";
+import { MdEdit,MdDelete, MdPushPin, MdOutlinePushPin } from "react-icons/md";
 import Tooltip from "@mui/material/Tooltip";
 import { IconButton } from "@mui/material";
 import { truncateText } from "../../utils/truncateText";
 import { Link } from "react-router-dom";
+import api from "../../services/api";
 import "react-quill/dist/quill.snow.css";
 import Modals from "../PopModal";
 import moment from "moment";
+import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
-const NoteItems = ({ parsedContent, id, createdAt, onDelete }) => {
+const NoteItems = ({ parsedContent, id, createdAt, pinned, onNoteUpdated, onDelete }) => {
   const formattedDate = moment(createdAt).format("D MMMM YYYY");
   const [modalOpen, setModalOpen] = useState(false);
+  const [pinning, setPinning] = useState(false);
+
+  const togglePin = async () => {
+    setPinning(true);
+    try {
+      const newPinned = !pinned;
+      await api.put(`/notes/${id}/pin`, { pinned: newPinned });
+      showSuccessToast(newPinned ? "Note pinned" : "Note unpinned");
+      onNoteUpdated();
+    } catch (error) {
+      showErrorToast("Failed to update note pin status");
+    } finally {
+      setPinning(false);
+    }
+  };
+
 
   return (
     <div className="relative bg-gradient-to-b from-slate-100 to-slate-200 text-gray-800 rounded-lg shadow-md min-h-[24rem] max-h-[24rem] overflow-hidden p-5 transition-transform transform hover:scale-105">
+      <div className="absolute top-2 right-2 z-10">
+        <Tooltip title={pinned ? "Unpin Note" : "Pin Note"}>
+        <IconButton onClick={togglePin} disabled={pinning}>
+            {pinned ? (
+              <span className="text-red-500 text-2xl" role="img" aria-label="pinned">
+                📌
+              </span>
+            ) : (
+              <MdOutlinePushPin className="text-black text-2xl" />
+            )}
+          </IconButton>
+        </Tooltip>
+      </div>
       <div className="mb-12">
         <div
           className="ql-editor font-customWeight"

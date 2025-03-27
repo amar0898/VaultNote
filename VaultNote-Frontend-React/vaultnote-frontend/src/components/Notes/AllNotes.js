@@ -5,7 +5,6 @@ import NoteItems from "./NoteItems";
 import { FiFilePlus, FiSearch, FiAlertCircle } from "react-icons/fi";
 import { Blocks } from "react-loader-spinner";
 import Errors from "../Errors";
-import { showSuccessToast, showErrorToast } from "../../utils/toast";
 
 const AllNotes = () => {
   const [notes, setNotes] = useState([]);
@@ -41,6 +40,8 @@ const AllNotes = () => {
   const handleNoteDeleted = () => {
       fetchNotes();
   };
+
+  const sortedNotes = filteredNotes.sort((a, b) => (b.pinned === true ? 1 : 0) - (a.pinned === true ? 1 : 0));
 
   if (error) {
     return <Errors message={error} />;
@@ -104,15 +105,15 @@ const AllNotes = () => {
                   </div>
                 </div>
               </div>
-            ) : query.trim() !== "" && filteredNotes.length === 0 ? (
+            ) : query.trim() !== "" && sortedNotes.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-72">
                 <FiAlertCircle size={48} className="text-gray-500" />
                 <p className="text-gray-500 mt-4">No notes found matching your search.</p>
               </div>
             ) : (
               <div className="pt-10 grid xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1 gap-y-10 gap-x-5 justify-center">
-                {filteredNotes.map((item) => (
-                  <NoteItems key={item.id} {...item} id={item.id} onDelete={handleNoteDeleted} />
+                {sortedNotes.map((item) => (
+                  <NoteItems key={item.id} parsedContent={item.parsedContent} id={item.id} createdAt={item.createdAt} pinned={item.pinned} onNoteUpdated={handleNoteDeleted} onDelete={handleNoteDeleted} />
                 ))}
               </div>
             )}

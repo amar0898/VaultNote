@@ -76,4 +76,12 @@ public class NoteServiceImpl implements NoteService {
                 .findByOwnerUsername(username);
         return personalNotes;
     }
+
+    @Override
+    public void togglePin(Long noteId, boolean pinned) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        note.setPinned(pinned);
+        noteRepository.save(note);
+    }
 }

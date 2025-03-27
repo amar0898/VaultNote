@@ -1,12 +1,16 @@
 package com.amardeep.VaultNote.controllers;
+import com.amardeep.VaultNote.dtos.PinRequest;
 import com.amardeep.VaultNote.models.Note;
+import com.amardeep.VaultNote.security.response.MessageResponse;
 import com.amardeep.VaultNote.services.NoteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -44,5 +48,11 @@ public class NoteController {
                            @AuthenticationPrincipal UserDetails userDetails) {
         String username = userDetails.getUsername();
         noteService.deleteNoteForUser(noteId, username);
+    }
+
+    @PutMapping("/{noteId}/pin")
+    public ResponseEntity<?> togglePin(@PathVariable Long noteId, @RequestBody PinRequest pinRequest) {
+       noteService.togglePin(noteId, pinRequest.isPinned());
+        return ResponseEntity.ok(new MessageResponse("Note pin status updated"));
     }
 }
