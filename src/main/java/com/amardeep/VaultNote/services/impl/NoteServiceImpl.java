@@ -84,4 +84,12 @@ public class NoteServiceImpl implements NoteService {
         note.setPinned(pinned);
         noteRepository.save(note);
     }
+
+    @Override
+    public void toggleFavourite(Long noteId, boolean favourite) {
+        Note note = noteRepository.findById(noteId)
+                .orElseThrow(() -> new RuntimeException("Note not found"));
+        note.setFavourite(favourite);
+        noteRepository.save(note);
+    }
 }

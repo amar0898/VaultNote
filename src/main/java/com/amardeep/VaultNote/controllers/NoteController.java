@@ -1,4 +1,5 @@
 package com.amardeep.VaultNote.controllers;
+import com.amardeep.VaultNote.dtos.FavouriteRequest;
 import com.amardeep.VaultNote.dtos.PinRequest;
 import com.amardeep.VaultNote.models.Note;
 import com.amardeep.VaultNote.security.response.MessageResponse;
@@ -54,5 +55,11 @@ public class NoteController {
     public ResponseEntity<?> togglePin(@PathVariable Long noteId, @RequestBody PinRequest pinRequest) {
        noteService.togglePin(noteId, pinRequest.isPinned());
         return ResponseEntity.ok(new MessageResponse("Note pin status updated"));
+    }
+
+    @PutMapping("/{noteId}/favourite")
+    public ResponseEntity<?> toggleFavourite(@PathVariable Long noteId, @RequestBody FavouriteRequest favouriteRequest) {
+        noteService.toggleFavourite(noteId, favouriteRequest.isFavourite());
+        return ResponseEntity.ok(new MessageResponse("Note favourite status updated"));
     }
 }

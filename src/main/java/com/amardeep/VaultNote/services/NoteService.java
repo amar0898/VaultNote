@@ -16,4 +16,6 @@ public interface NoteService {
     List<Note> getNotesForUser(String username);
 
     void togglePin(Long id, boolean pinned);
+
+    void toggleFavourite(Long id, boolean favourite);
 }

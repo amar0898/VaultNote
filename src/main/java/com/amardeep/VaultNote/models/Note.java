@@ -17,6 +17,7 @@ public class Note {
     private String content;
     private String ownerUsername;
     private boolean pinned = false;
+    private boolean favourite = false;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdAt;
