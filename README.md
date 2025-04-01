@@ -7,7 +7,7 @@ A secure note-taking web application designed with a cloud-native, scalable arch
 
 ## 🧠 Features:
 ### 👤 User Functionality:
-• Sign up/Login via Email/Password or OAuth2.0 (Google, GitHub)
+• Sign up/Login via Email/Password or OAuth2.0 (Google, GitHub)<br>
 • Secure password reset via email
 • Create, view, edit, delete, pin, and favorite notes
 • Search and filter notes
