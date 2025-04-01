@@ -8,26 +8,26 @@ A secure note-taking web application designed with a cloud-native, scalable arch
 ## 🧠 Features:
 ### 👤 User Functionality:
 • Sign up/Login via Email/Password or OAuth2.0 (Google, GitHub)<br>
-• Secure password reset via email
-• Create, view, edit, delete, pin, and favorite notes
-• Search and filter notes
-• Update profile info (username, password, profile picture)
-• Enable/Disable 2FA (Two-Factor Authentication)
+• Secure password reset via email<br>
+• Create, view, edit, delete, pin, and favorite notes<br>
+• Search and filter notes<br>
+• Update profile info (username, password, profile picture)<br>
+• Enable/Disable 2FA (Two-Factor Authentication)<br>
 • Contact form to submit queries or issues (emails sent to app owner)
 
 ### 🛡️ Admin Functionality:
-• Manage all user accounts
-• Update user status, password, and credential expiration
+• Manage all user accounts<br>
+• Update user status, password, and credential expiration<br>
 • Monitor user/app activity via real-time audit logs
 
 ## 🔐 Security & Architecture:
-• JWT Authentication & Authorization
-• Role-Based Access Control (User, Admin)
-• OAuth 2.0 login integration
-• 2FA using verification codes (email)
-• Spring Security for endpoint protection
-• Redis Cloud for caching verification codes and updates
-• Kafka Cloud for audit log streaming
+• JWT Authentication & Authorization<br>
+• Role-Based Access Control (User, Admin)<br>
+• OAuth 2.0 login integration<br>
+• 2FA using verification codes (email)<br>
+• Spring Security for endpoint protection<br>
+• Redis Cloud for caching verification codes and updates<br>
+• Kafka Cloud for audit log streaming<br>
 • JavaMailSender for account-related emails
 
 ## ☁️ Tech Stack & Deployment
@@ -45,7 +45,7 @@ A secure note-taking web application designed with a cloud-native, scalable arch
 
 
 ## 🔭 Future Scope
-• 🔐 Add note-locking with passwords or secure codes
+• 🔐 Add note-locking with passwords or secure codes<br>
 • 📎 Support for uploading documents and media files with notes
 
 ## 🤝 Feedback & Contributions
