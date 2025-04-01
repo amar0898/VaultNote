@@ -31,6 +31,8 @@ import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.time.LocalDate;
@@ -41,7 +43,7 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 //@EnableMethodSecurity(prePostEnabled = true, securedEnabled = true, jsr250Enabled = true)
-public class SecurityConfig {
+public class SecurityConfig{
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
@@ -63,7 +65,7 @@ public class SecurityConfig {
 
         //http.addFilterBefore(sameSiteCookieFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        http.cors(Customizer.withDefaults());
+        //http.cors(Customizer.withDefaults());
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
         //http.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()).csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                // .ignoringRequestMatchers("/api/auth/public/**","/api/csrf-token"));
@@ -79,30 +81,28 @@ public class SecurityConfig {
                         .oauth2Login(oauth2 -> {
                           oauth2.successHandler(loginSuccessHandler);
                          });
-        http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        http.formLogin(Customizer.withDefaults());
-        http.httpBasic(Customizer.withDefaults());
+        http.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler));
+        //http.formLogin(Customizer.withDefaults());
+        //http.httpBasic(Customizer.withDefaults());
         return http.build();
     }
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfig = new CorsConfiguration();
-        // Allow specific origins
-        corsConfig.setAllowedOrigins(Collections.singletonList(frontendUrl));
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Set the allowed origins (exact match)
+        configuration.setAllowedOrigins(List.of("http://vault-note.s3-website.ca-central-1.amazonaws.com"));
+        // Allowed HTTP methods
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // Allowed headers
+        configuration.setAllowedHeaders(List.of("*"));
+        // Allow credentials (cookies, authorization headers, etc.)
+        configuration.setAllowCredentials(true);
 
-        // Allow specific HTTP methods
-        corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Allow specific headers
-        corsConfig.setAllowedHeaders(List.of("Authorization", "Content-Type", "X-XSRF-TOKEN"));
-        corsConfig.setExposedHeaders(List.of("X-XSRF-TOKEN"));
-        // Allow credentials (cookies, authorization headers)
-        corsConfig.setAllowCredentials(true);
-        corsConfig.setMaxAge(3600L);
-        // Define allowed paths (for all paths use "/**")
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfig); // Apply to all endpoints
+        // Apply this configuration for all paths
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 

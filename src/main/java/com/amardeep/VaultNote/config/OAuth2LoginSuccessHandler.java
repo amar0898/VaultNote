@@ -40,7 +40,7 @@ public class OAuth2LoginSuccessHandler extends SavedRequestAwareAuthenticationSu
     @Autowired
     RoleRepository roleRepository;
 
-    @Value("${frontend.url}")
+    @Value("http://vault-note.s3-website.ca-central-1.amazonaws.com")
     private String frontendUrl;
 
     String username;

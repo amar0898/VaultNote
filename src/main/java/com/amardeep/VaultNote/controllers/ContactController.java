@@ -22,14 +22,14 @@ public class ContactController {
     private JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
-    String from;
+    String to;
 
     @PostMapping
     public ResponseEntity<?> sendContactMessage(@Valid @RequestBody ContactRequestDTO contactRequest) {
 
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setTo(contactRequest.getEmail());
-        simpleMailMessage.setFrom(from);
+        simpleMailMessage.setTo(to);
+        simpleMailMessage.setFrom(contactRequest.getEmail());
         simpleMailMessage.setSubject("New Message Received from - " + contactRequest.getName());
         simpleMailMessage.setText(contactRequest.getMessage());
         mailSender.send(simpleMailMessage);

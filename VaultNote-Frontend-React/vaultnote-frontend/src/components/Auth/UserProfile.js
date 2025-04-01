@@ -57,7 +57,7 @@ const UserProfile = () => {
     register,
     handleSubmit,
     setValue,
-
+    watch,
     formState: { errors },
   } = useForm({
     defaultValues: {
@@ -67,6 +67,10 @@ const UserProfile = () => {
     },
     mode: "onTouched",
   });
+
+  const watchedUsername = watch("username");
+  const watchedPassword = watch("password");
+  const isChanged = (currentUser && watchedUsername !== currentUser.username) || (watchedPassword && watchedPassword.trim().length > 0);
 
   //fetching the 2fa sttaus
 
@@ -472,12 +476,11 @@ const UserProfile = () => {
                           min={6}
                         />
                         <Buttons
-                          disabled={loading}
-                          className="bg-btnColor font-semibold flex justify-center text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-md my-3"
-                          type="submit"
-                        >
-                          {loading ? <span>Loading...</span> : "Update"}
-                        </Buttons>
+                        disabled={loading || !isChanged}
+                        className="bg-btnColor font-semibold flex justify-center text-white w-full py-2 hover:text-slate-400 transition-colors duration-100 rounded-md my-3"
+                        type="submit">
+                        {loading ? <span>Loading...</span> : "Update"}
+                      </Buttons>
                       </form>
                     </AccordionDetails>
                   </Accordion>

@@ -97,7 +97,7 @@ const AllNotes = () => {
       />
         </div>
         <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 sm:mt-0">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <label htmlFor="favouritesOnly" className="text-sm text-gray-700">
               Favourites
             </label>
@@ -109,7 +109,7 @@ const AllNotes = () => {
               className="h-4 w-4"
             />
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <label htmlFor="pinnedOnly" className="text-sm text-gray-700">
               Pinned
             </label>
@@ -121,7 +121,7 @@ const AllNotes = () => {
               className="h-4 w-4"
             />
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <label htmlFor="createdOn" className="text-sm text-gray-700">
               Created On
             </label>
@@ -133,7 +133,7 @@ const AllNotes = () => {
               className="border border-gray-300 rounded-md p-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300"
             />
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <label htmlFor="updatedOn" className="text-sm text-gray-700">
               Updated On
             </label>

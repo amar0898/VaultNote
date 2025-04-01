@@ -81,6 +81,7 @@ const Login = () => {
       }
     } catch (error) {
       if (error) {
+        console.log(error);
         showErrorToast("There is no account with this username or password. Please check your credentials and try again!");
       }
     } finally {

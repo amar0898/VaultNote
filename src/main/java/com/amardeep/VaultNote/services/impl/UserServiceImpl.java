@@ -37,7 +37,7 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
-    @Value("${frontend.url}")
+    @Value("http://vault-note.s3-website.ca-central-1.amazonaws.com")
     String frontendUrl;
 
     @Autowired
