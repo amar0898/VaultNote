@@ -51,3 +51,5 @@ A secure note-taking web application designed with a cloud-native, scalable arch
 ## 🤝 Feedback & Contributions
 Please try out the application and feel free to open issues or suggestions!
 I’d love to connect, collaborate, and hear your thoughts.
+
+
